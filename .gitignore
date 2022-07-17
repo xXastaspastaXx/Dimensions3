@@ -1,8 +1,8 @@
 
 .metadata/*
 *.prefs
-DimensionsUnbreakable/.project
-DimensionsUnbreakable/.classpath
+*.project
+*.classpath
 *.lst
 *.properties
 dimensions/target/dimensions-3.0.1.jar
@@ -24,8 +24,6 @@ dimensions/.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properti
 dimensions/.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/history.version
 dimensions/.metadata/.plugins/org.eclipse.core.resources/.projects/.org.eclipse.egit.core.cmp/.location
 dimensions/.metadata/.lock
-dimensions/.classpath
-dimensions/.project
 /.metadata/
-DimensionsHubWorld/.project
-DimensionsHubWorld/.classpath
+*.gitignore
+*.jar

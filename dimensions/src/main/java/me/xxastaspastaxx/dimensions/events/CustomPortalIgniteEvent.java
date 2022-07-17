@@ -4,6 +4,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
@@ -17,11 +18,13 @@ public class CustomPortalIgniteEvent extends Event implements Cancellable {
 	private CompletePortal completePortal;
 	private CustomPortalIgniteCause cause;
 	private Entity entity;
+	private ItemStack lighter;
 	
-    public CustomPortalIgniteEvent(CompletePortal completePortal, CustomPortalIgniteCause cause, Entity entity) {
+    public CustomPortalIgniteEvent(CompletePortal completePortal, CustomPortalIgniteCause cause, Entity entity, ItemStack item) {
     	this.completePortal = completePortal;
     	this.cause = cause;
     	this.entity = entity;
+    	this.lighter = item;
 	}
 
     
@@ -36,6 +39,9 @@ public class CustomPortalIgniteEvent extends Event implements Cancellable {
 	
 	public Entity getEntity() {
 		return entity;
+	}
+	public ItemStack getLighter() {
+		return lighter;
 	}
 
 

@@ -31,10 +31,10 @@ public class CustomPortalLoader {
 	private static final File PORTALS_DIRECTORY = new File(DIRECTORY_PATH);
 	private static final String CONFIG_VERSION = "3.0.0";
 	
-	private Class<?> blockClass;
-	private Class<?> craftBlockDataClass;
-	private Method getCombinedIdMethod;
-	private Method getStateMethod;
+	private static Class<?> blockClass;
+	private static Class<?> craftBlockDataClass;
+	private static Method getCombinedIdMethod;
+	private static Method getStateMethod;
 	
 	public CustomPortalLoader() {
 		try {
@@ -77,19 +77,8 @@ public class CustomPortalLoader {
 			AxisOrFace outsideBlockDir = new AxisOrFace(portalConfig.getString("Portal.Frame.Face", "all"));
 			Material insideMaterial = Material.matchMaterial(portalConfig.getString("Portal.InsideMaterial", "NEHTER_PORTAL"));
 
-			int combinedId[] = new int[2];
-			BlockData[] insideBlockData = new BlockData[] {getInsideBlockData(false, insideMaterial),getInsideBlockData(true, insideMaterial)};
-			if (insideMaterial.isSolid() || insideMaterial==Material.NETHER_PORTAL) {
-				try {
-					Object nmsBlockData = getStateMethod.invoke(insideBlockData[0]);
-					combinedId[0] = (int) getCombinedIdMethod.invoke(blockClass,nmsBlockData);
-					
-					nmsBlockData = getStateMethod.invoke(insideBlockData[1]);
-					combinedId[1] = (int) getCombinedIdMethod.invoke(blockClass,nmsBlockData);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-					e1.printStackTrace();
-				}
-			}
+//			BlockData[] insideBlockData = new BlockData[] {getInsideBlockData(false, tempBlockData),getInsideBlockData(true, tempBlockData)};
+//			int[] combinedId = createCombinedID(insideBlockData, insideMaterial);
 			
 			Material lighterMaterial = Material.matchMaterial(portalConfig.getString("Portal.LighterMaterial", "FLINT_AND_STEEL"));
 			String[] particlesColorString = portalConfig.getString("Portal.ParticlesColor", "0;0;0").split(";");
@@ -134,8 +123,9 @@ public class CustomPortalLoader {
 				entitySpawning.put(EntityType.valueOf(spl[0]), Integer.parseInt(spl[1]));
 			}
 			
-			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, combinedId, insideBlockData, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
+			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
 					worldName, ratio, buildExitPortal, spawnOnAir, disabledWorlds, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
+			portal.setInsideBlockData(insideMaterial.createBlockData());
 			for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
 				addon.registerPortal(portalConfig, portal);
 			}
@@ -145,8 +135,23 @@ public class CustomPortalLoader {
 		return res;
 	}
 
-	public BlockData getInsideBlockData(boolean zAxis, Material mat) {
-		BlockData blockData = mat.createBlockData();
+	public static int[] createCombinedID(BlockData[] insideBlockData, Material insideMaterial) {
+		int combinedId[] = new int[2];
+		if (insideMaterial.isSolid() || insideMaterial==Material.NETHER_PORTAL) {
+			try {
+				Object nmsBlockData = getStateMethod.invoke(insideBlockData[0]);
+				combinedId[0] = (int) getCombinedIdMethod.invoke(blockClass,nmsBlockData);
+				
+				nmsBlockData = getStateMethod.invoke(insideBlockData[1]);
+				combinedId[1] = (int) getCombinedIdMethod.invoke(blockClass,nmsBlockData);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+				e1.printStackTrace();
+			}
+		}
+		return combinedId;
+	}
+
+	public static BlockData getInsideBlockData(boolean zAxis, BlockData blockData) {
 		if (zAxis) {
 			if (blockData instanceof Orientable) {
 				Orientable orientable = (Orientable) blockData;

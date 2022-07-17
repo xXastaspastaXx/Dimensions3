@@ -100,14 +100,14 @@ public class CompletePortal {
 	public void handleEntity(Entity en) {
 		if (hold.contains(en)) return;
 		
-		CustomPortalUseEvent useEvent = new CustomPortalUseEvent(this, en, getDestinationPortal(false));
+		CustomPortalUseEvent useEvent = new CustomPortalUseEvent(this, en, getDestinationPortal(false, null));
 		Bukkit.getPluginManager().callEvent(useEvent);
 		
 		if (useEvent.isCancelled()) return; 
 		CompletePortal destination = useEvent.getDestinationPortal();
 		
 		//If no portal was put as a destination from other sources, we create our own
-		if (destination==null) destination = getDestinationPortal(true);
+		if (destination==null) destination = getDestinationPortal(true, null);
 		
 		Location teleportLocation = destination.getCenter().clone();
 		teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
@@ -128,11 +128,11 @@ public class CompletePortal {
 	}
 	
 	
-	public CompletePortal getDestinationPortal(boolean buildNewPortal) {
+	public CompletePortal getDestinationPortal(boolean buildNewPortal, Location overrideLocation) {
 
 		if (linkedPortal!=null) return linkedPortal;
 		
-		Location newLocation = getCenter();
+		Location newLocation = overrideLocation==null?getCenter():overrideLocation;
 		
 		World destinationWorld = customPortal.getWorld();
 		if (!world.equals(destinationWorld)) {
@@ -186,7 +186,7 @@ public class CompletePortal {
 			
 			PortalGeometry geom = PortalGeometry.getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
 			if (geom==null) return null;
-			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL);
+			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL, null);
 		}
 		
 		if (destination.getLinkedPortal()==null) {
@@ -339,7 +339,7 @@ public class CompletePortal {
 		hold.remove(en);
 	}
 
-	public void setTag(String key, String value) {
+	public void setTag(String key, Object value) {
 		if (value==null)
 			tags.remove(key);
 		else

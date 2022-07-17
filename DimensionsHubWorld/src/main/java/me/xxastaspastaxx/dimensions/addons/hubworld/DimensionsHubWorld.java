@@ -31,7 +31,7 @@ public class DimensionsHubWorld extends DimensionsAddon implements Listener {
 	private Plugin pl;
 	
 	public DimensionsHubWorld() {
-		super("DimensionsHubWorldAddon", "1.0.5", "Set a portal hub", DimensionsAddonPriority.NORMAL);
+		super("DimensionsHubWorldAddon", "3.0.0", "Set a portal hub", DimensionsAddonPriority.NORMAL);
 	}
 	
 	@Override

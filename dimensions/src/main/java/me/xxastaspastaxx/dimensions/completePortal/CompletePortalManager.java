@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
@@ -118,11 +119,11 @@ public class CompletePortalManager {
 		return closestPortal;
 	}
 
-	public CompletePortal createNew(CompletePortal completePortal, Entity igniter, CustomPortalIgniteCause cause) {
+	public CompletePortal createNew(CompletePortal completePortal, Entity igniter, CustomPortalIgniteCause cause, ItemStack item) {
 
 		if (completePortal.getPortalGeometry()==null) return null;
 		
-		CustomPortalIgniteEvent igniteEvent = new CustomPortalIgniteEvent(completePortal, cause, igniter);
+		CustomPortalIgniteEvent igniteEvent = new CustomPortalIgniteEvent(completePortal, cause, igniter, item);
 		Bukkit.getPluginManager().callEvent(igniteEvent);
 		
 		if (igniteEvent.isCancelled())  return null;

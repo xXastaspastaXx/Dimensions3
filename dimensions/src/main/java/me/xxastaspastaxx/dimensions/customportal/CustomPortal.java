@@ -56,7 +56,7 @@ public class CustomPortal {
 	int spawnDelayMax;
 	HashMap<EntityType, Integer> entitySpawnList;
 	public CustomPortal(String portalId, String displayName, boolean enabled, Material outsideMaterial, AxisOrFace outsideBlockDir,
-			Material insideMaterial, int[] combinedID, BlockData[] insideBlockData, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
+			Material insideMaterial, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
 			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, float worldRatio, boolean buildExitPortal, boolean spawnOnAir,
 			List<String> disabledWorldsList, HashMap<EntityType, EntityType> entityTransformationList,
 			int spawnDelayMin, int spawnDelayMax, HashMap<EntityType, Integer> entitySpawnList) {
@@ -66,8 +66,6 @@ public class CustomPortal {
 		this.outsideMaterial = outsideMaterial;
 		this.outsideBlockDir = outsideBlockDir;
 		this.insideMaterial = insideMaterial;
-		this.combinedID = combinedID;
-		this.insideBlockData = insideBlockData;
 		this.lighterMaterial = lighterMaterial;
 		this.particlesColor = particlesColor;
 		this.breakSound = breakSound;
@@ -173,11 +171,17 @@ public class CustomPortal {
 		PortalGeometry temp = PortalGeometry.getPortal(this, loc);
 		if (temp==null) return null;
 		
-		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(this, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER);
+		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(this, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER, item);
 		
 	}
 	
 	public boolean isPortalBlock(Block block) {
 		return block.getType()==outsideMaterial && outsideBlockDir.isData(block.getBlockData());
+	}
+
+	public void setInsideBlockData(BlockData blockData) {
+		insideBlockData = new BlockData[] {CustomPortalLoader.getInsideBlockData(false, blockData.clone()),CustomPortalLoader.getInsideBlockData(true, blockData.clone())};
+		combinedID = CustomPortalLoader.createCombinedID(insideBlockData, blockData.getMaterial());
+		
 	}
 }

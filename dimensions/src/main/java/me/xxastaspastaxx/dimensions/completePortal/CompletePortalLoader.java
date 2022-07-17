@@ -10,7 +10,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,7 +58,7 @@ public class CompletePortalLoader {
 				if (geom==null) continue;
 				
 				CompletePortal completePortal = new CompletePortal(customPortal, world, geom);
-				Dimensions.getCompletePortalManager().createNew(completePortal, null, CustomPortalIgniteCause.LOAD_PORTAL);
+				Dimensions.getCompletePortalManager().createNew(completePortal, null, CustomPortalIgniteCause.LOAD_PORTAL, null);
 				
 				completePortal.setTags(gson.fromJson((String) portal.get("portalTags"), new TypeToken<HashMap<String, Object>>() { }.getType()));
 				

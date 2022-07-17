@@ -23,7 +23,7 @@ public class PortalGeometry {
 	
 	private boolean zAxis;
 
-	private PortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
+	protected PortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
 			boolean zAxis, Vector center) {
 		this.min = min;
 		this.max = max;

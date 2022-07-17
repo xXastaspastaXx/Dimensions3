@@ -12,7 +12,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
@@ -23,15 +22,15 @@ import me.xxastaspastaxx.dimensions.events.CustomPortalBreakEvent;
 
 public class DimensionsUnbreakable extends DimensionsAddon implements Listener {
 	
-	private Plugin pl;
+	//private Plugin pl;
 	
 	public DimensionsUnbreakable() {
-		super("DimensionsUnbreakableAddon", "1.0.2", "Unbreakable portals", DimensionsAddonPriority.NORMAL);
+		super("DimensionsUnbreakableAddon", "3.0.0", "Unbreakable portals", DimensionsAddonPriority.NORMAL);
 	}
 	
 	@Override
 	public void onEnable(Dimensions pl) {
-		this.pl = pl;
+		//this.pl = pl;
 		
 		Bukkit.getPluginManager().registerEvents(this, pl);
 	}

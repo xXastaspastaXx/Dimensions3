@@ -60,13 +60,13 @@ import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 
 public class PortalListener implements Listener {
 
-	private Dimensions pl;
+	//private Dimensions pl;
 	
 	private PacketListener packetListener1;
 	//private PacketListener packetListener2;
 	
 	public PortalListener(Dimensions pl) {
-		this.pl = pl;
+		//this.pl = pl;
 		//PacketType.Play.Server.UNLOAD_CHUNK = new PacketType(Protocol.PLAY, Sender.SERVER, 0x22, "MapChunk", "SPacketChunkData");
 		
 		packetListener1 = new PacketAdapter(pl, ListenerPriority.LOW, PacketType.Play.Server.MAP_CHUNK) {
