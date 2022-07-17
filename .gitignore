@@ -27,3 +27,4 @@ dimensions/.metadata/.lock
 /.metadata/
 *.gitignore
 *.jar
+*.class
