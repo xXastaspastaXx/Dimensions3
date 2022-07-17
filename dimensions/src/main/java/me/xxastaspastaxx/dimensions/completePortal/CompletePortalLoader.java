@@ -10,17 +10,20 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.reflect.TypeToken;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
+import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 
 public class CompletePortalLoader {
 	
@@ -30,7 +33,7 @@ public class CompletePortalLoader {
 	
 	
 	public CompletePortalLoader() {
-		gson = new Gson();
+		gson = new GsonBuilder().create();
 		
 		File f = new File(FILE_PATH);
 		if (!f.exists()) {
@@ -53,14 +56,17 @@ public class CompletePortalLoader {
 				World world = Bukkit.getWorld((String) portal.get("world"));
 				Location loc = new Location(world, (double) portal.get("centerX"), (double) portal.get("centerY"), (double) portal.get("centerZ"));
 				PortalGeometry geom = PortalGeometry.getPortal(customPortal, loc);
+				if (geom==null) continue;
 				
 				CompletePortal completePortal = new CompletePortal(customPortal, world, geom);
-				Dimensions.getCompletePortalManager().createNew(completePortal);
+				Dimensions.getCompletePortalManager().createNew(completePortal, null, CustomPortalIgniteCause.LOAD_PORTAL);
+				
+				completePortal.setTags(gson.fromJson((String) portal.get("portalTags"), new TypeToken<HashMap<String, Object>>() { }.getType()));
 				
 				if (portal.containsKey("linkedPortalWorld")) {
 					World linkedWorld = Bukkit.getWorld((String) portal.get("linkedPortalWorld"));
 					Location linkedLoc = new Location(linkedWorld, (double) portal.get("linkedPortalCenterX"), (double) portal.get("linkedPortalCenterY"), (double) portal.get("linkedPortalCenterZ"));
-					CompletePortal linkedPortal = Dimensions.getCompletePortalManager().getPortal(linkedLoc, false, false);
+					CompletePortal linkedPortal = Dimensions.getCompletePortalManager().getCompletePortal(linkedLoc, false, false);
 					if (linkedPortal!=null) {
 						completePortal.setLinkedPortal(linkedPortal);
 						linkedPortal.setLinkedPortal(completePortal);
@@ -90,6 +96,8 @@ public class CompletePortalLoader {
 				map.put("linkedPortalCenterY", linked.getCenter().getY());
 				map.put("linkedPortalCenterZ", linked.getCenter().getZ());
 			}
+			
+			map.put("portalTags", gson.toJson(portal.getTags()));
 			
 
 			portal.destroy(null);

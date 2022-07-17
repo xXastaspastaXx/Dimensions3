@@ -173,7 +173,7 @@ public class CustomPortal {
 		PortalGeometry temp = PortalGeometry.getPortal(this, loc);
 		if (temp==null) return null;
 		
-		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(this, loc.getWorld(), temp));
+		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(this, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER);
 		
 	}
 	

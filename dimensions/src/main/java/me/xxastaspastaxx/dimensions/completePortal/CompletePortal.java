@@ -1,6 +1,7 @@
 package me.xxastaspastaxx.dimensions.completePortal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -17,7 +18,8 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
-import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
+import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
+import me.xxastaspastaxx.dimensions.events.CustomPortalUseEvent;
 
 public class CompletePortal {
 	
@@ -38,6 +40,8 @@ public class CompletePortal {
 	//We keep a list of players that have been teleported to the portal in order to not spam teleport them around
 	ArrayList<Entity> hold = new ArrayList<Entity>();
 	
+	HashMap<String, Object> tags = new HashMap<String, Object>();
+	
 	public CompletePortal(CustomPortal customPortal, World world, PortalGeometry portalGeometry) {
 		this.customPortal = customPortal;
 		this.world = world;
@@ -47,10 +51,7 @@ public class CompletePortal {
 		chunkX = c.getX();
 		chunkZ = c.getZ();
 		
-		if (portalGeometry==null) {
-			Dimensions.getCompletePortalManager().removePortal(this, CustomPortalDestroyCause.UNKNOWN, null);
-			return;
-		}
+		if (portalGeometry==null) return;
 		
 		Vector min = portalGeometry.getInsideMin();
 		Vector max = portalGeometry.getInsideMax();
@@ -99,12 +100,21 @@ public class CompletePortal {
 	public void handleEntity(Entity en) {
 		if (hold.contains(en)) return;
 		
-		CompletePortal destination = getDestinationPortal(en);
+		CustomPortalUseEvent useEvent = new CustomPortalUseEvent(this, en, getDestinationPortal(false));
+		Bukkit.getPluginManager().callEvent(useEvent);
+		
+		if (useEvent.isCancelled()) return; 
+		CompletePortal destination = useEvent.getDestinationPortal();
+		
+		//If no portal was put as a destination from other sources, we create our own
+		if (destination==null) destination = getDestinationPortal(true);
 		
 		Location teleportLocation = destination.getCenter().clone();
 		teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
 		boolean zAxis = destination.getPortalGeometry().iszAxis();
 		teleportLocation.add(!zAxis?0.5f:0.5f,0,!zAxis?0.5f:0.5f);
+		
+		
 		
 		destination.pushToHold(en);
 		
@@ -118,7 +128,7 @@ public class CompletePortal {
 	}
 	
 	
-	public CompletePortal getDestinationPortal(Entity en) {
+	public CompletePortal getDestinationPortal(boolean buildNewPortal) {
 
 		if (linkedPortal!=null) return linkedPortal;
 		
@@ -150,6 +160,7 @@ public class CompletePortal {
 		CompletePortal destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, customPortal);
 		
 		if (destination==null) {
+			if (!buildNewPortal) return null;
 			byte width = portalGeometry.getPortalWidth();
 			byte height = portalGeometry.getPortalHeight();
 			boolean zAxis = portalGeometry.iszAxis();
@@ -175,7 +186,7 @@ public class CompletePortal {
 			
 			PortalGeometry geom = PortalGeometry.getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
 			if (geom==null) return null;
-			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom));
+			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL);
 		}
 		
 		if (destination.getLinkedPortal()==null) {
@@ -311,6 +322,11 @@ public class CompletePortal {
 				en.destroy(p);
 		}
 	}
+	
+	public boolean isInChunk(World world2, int x, int z) {
+		
+		return world.equals(world2) && chunkX==x && chunkZ==z;
+	}
 
 	public void pushToHold(Entity en) {
 		hold.add(en);
@@ -323,8 +339,22 @@ public class CompletePortal {
 		hold.remove(en);
 	}
 
-	public boolean isInChunk(World world2, int x, int z) {
-		
-		return world.equals(world2) && chunkX==x && chunkZ==z;
+	public void setTag(String key, String value) {
+		if (value==null)
+			tags.remove(key);
+		else
+			tags.put(key, value);
+	}
+	
+	public Object getTag(String key) {
+		return tags.get(key);
+	}
+
+	protected HashMap<String, Object> getTags() {
+		return tags;
+	}
+
+	public void setTags(HashMap<String, Object> tags) {
+		this.tags = tags;
 	}
 }

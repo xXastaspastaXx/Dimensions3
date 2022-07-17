@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -108,9 +109,9 @@ public class PortalListener implements Listener {
 		Player p = e.getPlayer();
 		
 
-		CompletePortal complTo = Dimensions.getCompletePortalManager().getPortal(e.getTo(), false, false);
+		CompletePortal complTo = Dimensions.getCompletePortalManager().getCompletePortal(e.getTo(), false, false);
 		
-		CompletePortal complFrom = Dimensions.getCompletePortalManager().getPortal(e.getFrom(), false, false);
+		CompletePortal complFrom = Dimensions.getCompletePortalManager().getCompletePortal(e.getFrom(), false, false);
 		if (complFrom!=null && complFrom.hasInHold(p)) {
 
 			if (complTo!=null && complFrom.equals(complTo)) return;
@@ -133,7 +134,7 @@ public class PortalListener implements Listener {
 				int rad = (int) ((e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_BLOCK)?Math.min(Math.ceil(e.getClickedBlock().getLocation().distance(e.getPlayer().getEyeLocation())),5):5);
 				List<Block> los = e.getPlayer().getLineOfSight(null, rad);
 				for (Block block : los) {
-					if (Dimensions.getCompletePortalManager().getPortal(block.getLocation(), false, false)!=null) {
+					if (Dimensions.getCompletePortalManager().getCompletePortal(block.getLocation(), false, false)!=null) {
 						e.setCancelled(true);
 						break;
 					}
@@ -143,7 +144,7 @@ public class PortalListener implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
         	//if (e.getItem() == null) return;
         	Block block = e.getClickedBlock().getRelative(e.getBlockFace());
-        	if (Dimensions.getCompletePortalManager().getPortal(block.getLocation(), false, false)!=null) return;
+        	if (Dimensions.getCompletePortalManager().getCompletePortal(block.getLocation(), false, false)!=null) return;
         	for (CustomPortal portals : Dimensions.getCustomPortalManager().getCustomPortals()) {
     			if (portals.tryIgnite(e.getPlayer(), e.getItem(), block.getLocation()) != null) {
     				e.setCancelled(true);
@@ -185,7 +186,7 @@ public class PortalListener implements Listener {
 				List<Block> los = p.getLineOfSight(null, 5);
 				for (Block block : los) {
 					if (!DimensionsUtils.isAir(block)) break;
-					CompletePortal portal = Dimensions.getCompletePortalManager().getPortal(block.getLocation(), false, false);
+					CompletePortal portal = Dimensions.getCompletePortalManager().getCompletePortal(block.getLocation(), false, false);
 					if (portal!=null) {
 						Dimensions.getCompletePortalManager().removePortal(portal, CustomPortalDestroyCause.PLAYER_INSIDE, p);
 						break;
@@ -211,7 +212,7 @@ public class PortalListener implements Listener {
 			int rad = (int) Math.ceil(eventBlock.getLocation().distance(p.getEyeLocation()));
 			List<Block> los = p.getLineOfSight(null, rad);
 			for (Block block : los) {
-				if (Dimensions.getCompletePortalManager().getPortal(block.getLocation(), false, false)!=null) {
+				if (Dimensions.getCompletePortalManager().getCompletePortal(block.getLocation(), false, false)!=null) {
 					return true;
 				}
 			}
@@ -223,13 +224,16 @@ public class PortalListener implements Listener {
 	public void onExplode(ExplosionPrimeEvent e) {
 		Entity exploder = e.getEntity();
 		for (CompletePortal portal : Dimensions.getCompletePortalManager().getNearestPortals(exploder.getLocation(),(int) (e.getRadius()+2))) {
-			Dimensions.getCompletePortalManager().removePortal(portal,CustomPortalDestroyCause.ENTITY, exploder);
+			if (!Dimensions.getCompletePortalManager().removePortal(portal,CustomPortalDestroyCause.ENTITY, exploder)) {
+				e.setCancelled(true);
+				break;
+			}
 		}
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onLiquidFlow(BlockFromToEvent e) {
-		if (Dimensions.getCompletePortalManager().getPortal(e.getBlock().getLocation(), false, false)!=null || Dimensions.getCompletePortalManager().getPortal(e.getToBlock().getLocation(), false, false)!=null) {
+		if (Dimensions.getCompletePortalManager().getCompletePortal(e.getBlock().getLocation(), false, false)!=null || Dimensions.getCompletePortalManager().getCompletePortal(e.getToBlock().getLocation(), false, false)!=null) {
 			e.setCancelled(true);
 		}
 	}
@@ -238,31 +242,38 @@ public class PortalListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(BlockFadeEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(BlockGrowEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(BlockBurnEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(BlockPistonExtendEvent e) {
 		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.PISTON);
 		for (Block block : e.getBlocks()) {
-			onBlockChange(block,null,CustomPortalDestroyCause.PISTON);
+			if (onBlockChange(block,null,CustomPortalDestroyCause.PISTON)) {
+				e.setCancelled(true);
+				break;
+			}
 		}
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(BlockPistonRetractEvent e) {
+		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.PISTON);
 		for (Block block : e.getBlocks()) {
-			onBlockChange(block,null,CustomPortalDestroyCause.PISTON);
+			if (onBlockChange(block,null,CustomPortalDestroyCause.PISTON)) {
+				e.setCancelled(true);
+				break;
+			}
 		}
 	}
 	
@@ -273,67 +284,61 @@ public class PortalListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(CauldronLevelChangeEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(FluidLevelChangeEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(FurnaceBurnEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(LeavesDecayEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(MoistureChangeEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(SpongeAbsorbEvent e) {
-		onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockChange(BlockPhysicsEvent e) {
+		e.setCancelled(onBlockChange(e.getBlock(),null,CustomPortalDestroyCause.BLOCK_PHYSICS));
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockChange(BlockBreakEvent e) {
-		onBlockChange(e.getBlock(),e.getPlayer(),CustomPortalDestroyCause.BLOCK_PHYSICS);
+		e.setCancelled(onBlockChange(e.getBlock(),e.getPlayer(),CustomPortalDestroyCause.PLAYER));
 	}
 	
 	//BLOCK CHANGE EVENT ^^^^^
 	
-	public void onBlockChange(Block block, Entity ent, CustomPortalDestroyCause cause) {
-		
-		Bukkit.getScheduler().runTaskAsynchronously(pl, new Runnable() {
-			
-			@Override
-			public void run() {
-				CompletePortal portal = Dimensions.getCompletePortalManager().getPortal(block.getLocation(), true, false);
-		        if (portal!=null) {
-		            Bukkit.getScheduler().runTask(pl, new Runnable() {
-						
-						@Override
-						public void run() {
-							Dimensions.getCompletePortalManager().removePortal(portal, CustomPortalDestroyCause.BLOCK_PHYSICS, ent);
-							
-						}
-					});
-		        }
-			}
-		});
+	public boolean onBlockChange(Block block, Entity ent, CustomPortalDestroyCause cause) {
+
+		List<CompletePortal> portals = Dimensions.getCompletePortalManager().getCompletePortals(block.getLocation(), true, false);
+		boolean cancel = false;
+        for (CompletePortal portal : portals) {
+        	cancel = !Dimensions.getCompletePortalManager().removePortal(portal, cause, ent) || cancel;
+        }
+		return cancel;
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onDamage(EntityDamageEvent e) {
 		DamageCause cause = e.getCause();
 		if (!((e.getEntity() instanceof LivingEntity) && (cause.equals(DamageCause.SUFFOCATION) || cause.equals(DamageCause.LAVA) || cause.equals(DamageCause.DROWNING) || cause.equals(DamageCause.HOT_FLOOR)))) return;
-		if (Dimensions.getCompletePortalManager().getPortal(e.getEntity().getLocation(), false ,false)!=null) e.setCancelled(true);
+		if (Dimensions.getCompletePortalManager().getCompletePortal(e.getEntity().getLocation(), false ,false)!=null) e.setCancelled(true);
 	}
 	
 	
@@ -341,7 +346,7 @@ public class PortalListener implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		
-		CompletePortal compl = Dimensions.getCompletePortalManager().getPortal(e.getPlayer().getLocation(), false, false);
+		CompletePortal compl = Dimensions.getCompletePortalManager().getCompletePortal(e.getPlayer().getLocation(), false, false);
 		if (compl!=null) {
 			compl.pushToHold(e.getPlayer());
 		}

@@ -26,3 +26,6 @@ dimensions/.metadata/.plugins/org.eclipse.core.resources/.projects/.org.eclipse.
 dimensions/.metadata/.lock
 dimensions/.classpath
 dimensions/.project
+/.metadata/
+DimensionsHubWorld/.project
+DimensionsHubWorld/.classpath

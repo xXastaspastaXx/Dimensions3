@@ -1,6 +1,8 @@
 package me.xxastaspastaxx.dimensions;
 
 import org.bukkit.Axis;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -34,7 +36,7 @@ public class DimensionsUtils {
 		netherPortalEffect.setAxis(zAxis?Axis.Z:Axis.X);
 		return netherPortalEffect;
 	}
-	/*TODO remove
+	
 	public static Location parseLocationFromString(String str, String delim) {
 		String[] spl = str.split(delim);
 		return new Location(Bukkit.getWorld(spl[0]), Double.parseDouble(spl[1]), Double.parseDouble(spl[2]), Double.parseDouble(spl[3]));
@@ -43,7 +45,7 @@ public class DimensionsUtils {
 	public static String locationToString(Location loc, String delim) {
 		return loc.getWorld().getName()+delim+loc.getX()+delim+loc.getY()+delim+loc.getZ();
 	}
-*/
+	
 	public static boolean isInt(String string) {
 		try {
 			Integer.parseInt(string);

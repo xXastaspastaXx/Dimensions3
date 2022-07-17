@@ -2,6 +2,7 @@ package me.xxastaspastaxx.dimensions.completePortal;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -13,7 +14,9 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
+import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 import me.xxastaspastaxx.dimensions.events.CustomPortalBreakEvent;
+import me.xxastaspastaxx.dimensions.events.CustomPortalIgniteEvent;
 
 public class CompletePortalManager {
 	
@@ -30,6 +33,23 @@ public class CompletePortalManager {
 	
 	public ArrayList<CompletePortal> getCompletePortals() {
 		return completePortals;
+	}
+	
+	public CompletePortal getCompletePortal(Location location, boolean outside, boolean corner) {
+		for (CompletePortal complete : completePortals) {
+			if (complete.isInsidePortal(location, outside, corner)) return complete;
+		}
+		return null;
+	}
+	
+	public List<CompletePortal> getCompletePortals(Location location, boolean outside, boolean corner) {
+		List<CompletePortal> res = new ArrayList<CompletePortal>();
+		
+		for (CompletePortal complete : completePortals) {
+			if (complete.isInsidePortal(location, outside, corner)) res.add(complete);
+		}
+		
+		return res;
 	}
 	
 	public ArrayList<CompletePortal> getCompletePortals(World world) {
@@ -98,9 +118,15 @@ public class CompletePortalManager {
 		return closestPortal;
 	}
 
-	public CompletePortal createNew(CompletePortal completePortal) {
-		
+	public CompletePortal createNew(CompletePortal completePortal, Entity igniter, CustomPortalIgniteCause cause) {
+
 		if (completePortal.getPortalGeometry()==null) return null;
+		
+		CustomPortalIgniteEvent igniteEvent = new CustomPortalIgniteEvent(completePortal, cause, igniter);
+		Bukkit.getPluginManager().callEvent(igniteEvent);
+		
+		if (igniteEvent.isCancelled())  return null;
+		
 		
 		completePortals.add(completePortal);
 		completePortal.fill(null);
@@ -108,14 +134,7 @@ public class CompletePortalManager {
 		return completePortal;
 	}
 	
-	public CompletePortal getPortal(Location location, boolean outside, boolean corner) {
-		for (CompletePortal complete : completePortals) {
-			if (complete.isInsidePortal(location, outside, corner)) return complete;
-		}
-		return null;
-	}
-
-	public void removePortal(CompletePortal completePortal, CustomPortalDestroyCause cause, Entity destroyer) {
+	public boolean removePortal(CompletePortal completePortal, CustomPortalDestroyCause cause, Entity destroyer) {
 		
 		CustomPortalBreakEvent breakEvent = new CustomPortalBreakEvent(completePortal, cause, destroyer);
 		Bukkit.getPluginManager().callEvent(breakEvent);
@@ -126,8 +145,9 @@ public class CompletePortalManager {
 				completePortal.getLinkedPortal().unlinkPortal();
 			}
 			completePortal.destroy(null);
+			return true;
 		}
-		
+		return false;
 	}
 
 	public void save() {
