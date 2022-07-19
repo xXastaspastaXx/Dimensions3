@@ -32,6 +32,10 @@ public class CustomPortalIgniteEvent extends Event implements Cancellable {
 	public CompletePortal getCompletePortal() {
 		return completePortal;
 	}
+	
+	public void replaceCompletePortal(CompletePortal newPortal) {
+		this.completePortal = newPortal;
+	}
 
 	public CustomPortalIgniteCause getCause() {
 		return cause;

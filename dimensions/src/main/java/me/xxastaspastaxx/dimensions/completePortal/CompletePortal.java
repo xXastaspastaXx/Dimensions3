@@ -47,11 +47,11 @@ public class CompletePortal {
 		this.world = world;
 		this.portalGeometry = portalGeometry;
 		
+		if (portalGeometry==null) return;
+		
 		Chunk c = getCenter().getChunk();
 		chunkX = c.getX();
 		chunkZ = c.getZ();
-		
-		if (portalGeometry==null) return;
 		
 		Vector min = portalGeometry.getInsideMin();
 		Vector max = portalGeometry.getInsideMax();
@@ -157,7 +157,7 @@ public class CompletePortal {
 		newLocation.setY(worldHeight*currPercent+minWorldHeight);
 		//===============
 		
-		CompletePortal destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, customPortal);
+		CompletePortal destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, true, true);
 		
 		if (destination==null) {
 			if (!buildNewPortal) return null;
@@ -187,6 +187,7 @@ public class CompletePortal {
 			PortalGeometry geom = PortalGeometry.getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
 			if (geom==null) return null;
 			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL, null);
+			if (destination==null) return null;
 		}
 		
 		if (destination.getLinkedPortal()==null) {
@@ -300,6 +301,7 @@ public class CompletePortal {
 	
 	
 	public void fill(Player p) {
+		if (getTag("hidePortalInside") != null) return;
 		if (p==null) {
 			for (Entity player : world.getNearbyEntities(getCenter(), 16*Bukkit.getViewDistance(), 255, 16*Bukkit.getViewDistance(), (player) -> player instanceof Player)) {
 				fill((Player) player);

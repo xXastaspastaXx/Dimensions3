@@ -18,10 +18,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
@@ -65,21 +67,58 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onPortalIgnite(CustomPortalIgniteEvent e) {
+
+		CompletePortal complete = e.getCompletePortal();
+		CustomPortal portal = complete.getCustomPortal();
+		Object manager = getOption(portal, "customFrame");
+		if (manager==null) return;
+		
+		FrameManager frameManager = (FrameManager) manager;
+		
+		if (!(complete.getPortalGeometry() instanceof CustomPortalGeometry)) {
+			if (e.getCause()==CustomPortalIgniteCause.EXIT_PORTAL || e.getCause()==CustomPortalIgniteCause.LOAD_PORTAL) {
+				
+				PortalGeometry portalGeometry = complete.getPortalGeometry();
+				Vector min = portalGeometry.getMin();
+				Vector max = portalGeometry.getMax();
+				boolean zAxis = portalGeometry.iszAxis();
+				
+				for (double y=min.getY();y<=max.getY();y++) {
+					for (double side=zAxis?min.getZ():min.getX();side<=(zAxis?max.getZ():max.getX());side++) {
+						Block block = new Location(complete.getWorld(), zAxis?min.getX():side, y, !zAxis?min.getZ():side).getBlock();
+						if ((y==min.getY() || y==max.getY()) || ((side==(zAxis?min.getZ():min.getX())) || side==(zAxis?max.getZ():max.getX()))) {
+							frameManager.placeBlock(block);
+						} else {
+							block.setType(Material.AIR);
+						}
+						
+					}
+				}
+				
+				PortalGeometry geom = CustomPortalGeometry.getPortal(portal, complete.getCenter(), frameManager);
+				if (geom==null) return;
+				e.replaceCompletePortal(Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, complete.getWorld(), geom), null, e.getCause(), null));
+			} else {
+				e.setCancelled(true);
+			}
+		}
+	}
+	/*
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void onPortalUse(CustomPortalUseEvent e) {
 		
 		CompletePortal complete = e.getCompletePortal();
 		CustomPortal portal = complete.getCustomPortal();
 		Object manager = getOption(portal, "customFrame");
 		if (manager==null) return;
-		System.out.println("test");
 		
-		if (!(complete.getPortalGeometry() instanceof CustomPortalGeometry)) {
-			e.setCancelled(true);
-		}
-	}
+		if (e.getDestinationPortal()==null)
+			complete.getDestinationPortal(true, null);
+	}*/
 	
 	HashMap<Player,Long> clicked = new HashMap<Player,Long>();
 	
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPortalInteract(PlayerInteractEvent e) {
 		
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -111,6 +150,20 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
         }
 	}
 	
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onPlayerClick(PlayerAnimationEvent e) {
+		Player p = e.getPlayer();
+
+		if (clicked.containsKey(p)) {
+			if (System.currentTimeMillis()-clicked.get(p)<500) {
+				e.setCancelled(true);
+				return;
+			} else {
+				clicked.remove(p);
+			}
+		}
+	}
+	
 	public CompletePortal tryIgnite(CustomPortal portal, Player player, ItemStack item, Location loc) {
 		
 		Object manager = getOption(portal, "customItem");
@@ -118,9 +171,13 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 			if (!((ItemManager) manager).isAccepted(item)) {
 				return null;
 			}
+		} else {
+			if (portal.getLighterMaterial()!=item.getType()) {
+				return null;
+			}
 		}
 		
-		PortalGeometry temp = CustomPortalGeometry.getPortal(portal, loc);
+		PortalGeometry temp = CustomPortalGeometry.getPortal(portal, loc, (FrameManager) getOption(portal, "customFrame"));
 		if (temp==null) return null;
 		
 		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER, item);

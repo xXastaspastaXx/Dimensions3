@@ -49,6 +49,7 @@ public class Dimensions extends JavaPlugin {
 	}
 	
 	public void onDisable() {
+		addonsManager.onDisable();
 		completePortalManager.save();
 	}
 	

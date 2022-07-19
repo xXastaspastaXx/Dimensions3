@@ -126,8 +126,8 @@ public class CompletePortalManager {
 		CustomPortalIgniteEvent igniteEvent = new CustomPortalIgniteEvent(completePortal, cause, igniter, item);
 		Bukkit.getPluginManager().callEvent(igniteEvent);
 		
-		if (igniteEvent.isCancelled())  return null;
-		
+		if (igniteEvent.isCancelled()) return null;
+		completePortal = igniteEvent.getCompletePortal();
 		
 		completePortals.add(completePortal);
 		completePortal.fill(null);

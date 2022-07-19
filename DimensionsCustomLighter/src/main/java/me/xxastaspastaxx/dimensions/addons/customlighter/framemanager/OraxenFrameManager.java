@@ -5,7 +5,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.NoteBlock;
 
 import io.th0rgal.oraxen.compatibilities.provided.lightapi.WrappedLightAPI;
-import io.th0rgal.oraxen.mechanics.Mechanic;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanic;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanicFactory;
 
@@ -19,7 +18,7 @@ public class OraxenFrameManager extends FrameManager {
 		
 	}
 	
-	public Mechanic getMechanic() {
+	public NoteBlockMechanic getMechanic() {
 		return noteBlockMechanic;
 	}
 

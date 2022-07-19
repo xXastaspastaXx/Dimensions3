@@ -57,8 +57,7 @@ public class CompletePortalLoader {
 				PortalGeometry geom = PortalGeometry.getPortal(customPortal, loc);
 				if (geom==null) continue;
 				
-				CompletePortal completePortal = new CompletePortal(customPortal, world, geom);
-				Dimensions.getCompletePortalManager().createNew(completePortal, null, CustomPortalIgniteCause.LOAD_PORTAL, null);
+				CompletePortal completePortal = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, world, geom), null, CustomPortalIgniteCause.LOAD_PORTAL, null);
 				
 				completePortal.setTags(gson.fromJson((String) portal.get("portalTags"), new TypeToken<HashMap<String, Object>>() { }.getType()));
 				
