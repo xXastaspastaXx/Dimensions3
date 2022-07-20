@@ -7,25 +7,23 @@ import org.bukkit.entity.Player;
 
 public class PortalEntitySolid extends PortalEntity {
 
-	private Location location;
 	private BlockData blockdata;
 	
 	public PortalEntitySolid(Location location, BlockData blockData) {
-		super();
-		this.location = location;
+		super(location);
 		this.blockdata = blockData;
 	}
 
 	public void summon(Player p) {
-		p.sendBlockChange(location, blockdata);
+		p.sendBlockChange(getLocation(), blockdata);
 	}
 	
 	public void destroy(Player p) {
-		p.sendBlockChange(location, Material.AIR.createBlockData());
+		p.sendBlockChange(getLocation(), Material.AIR.createBlockData());
 	}
 
 	public void destroyBroadcast() {
-		location.getBlock().setType(Material.AIR);
+		getLocation().getBlock().setType(Material.AIR);
 	}
 	
 }

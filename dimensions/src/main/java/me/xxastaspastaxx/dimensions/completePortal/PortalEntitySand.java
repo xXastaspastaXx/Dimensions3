@@ -22,6 +22,7 @@ public class PortalEntitySand extends PortalEntity {
 	private WrapperPlayServerEntityDestroy destroyPacket;
 	
 	public PortalEntitySand(Location location, int combinedID) {
+		super(location);
 		fallingBlockId =  (int) (Math.random() * Integer.MAX_VALUE);
 		
 		spawnPacket = new WrapperPlayServerSpawnEntity();

@@ -96,6 +96,10 @@ public class CompletePortal {
 		return portalGeometry.getCenter().toLocation(world);
 	}
 	
+	public ArrayList<PortalEntity> getPortalEntities() {
+		return spawnedEntities;
+	}
+	
 	
 	public void handleEntity(Entity en) {
 		if (hold.contains(en)) return;
@@ -112,7 +116,6 @@ public class CompletePortal {
 		Location teleportLocation = destination.getCenter().clone();
 		teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
 		boolean zAxis = destination.getPortalGeometry().iszAxis();
-		teleportLocation.add(!zAxis?0.5f:0.5f,0,!zAxis?0.5f:0.5f);
 		
 		
 		

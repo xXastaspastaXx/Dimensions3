@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -187,12 +186,12 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 		linked.setLinkedPortal(completePortal);
 		
 		PortalPosition originPos = new PortalPosition(
-	           completePortal.getCenter().add(!geom.iszAxis()?0.5:0.5,0.5,geom.iszAxis()?0.5:0.5),
+	           completePortal.getCenter(),
 	           geom.iszAxis()?PortalDirection.EAST:PortalDirection.NORTH
 	    );
 
 	    PortalPosition destinationPos = new PortalPosition(
-	    		linked.getCenter().add(!geom2.iszAxis()?0.5:0.5,0.5,geom2.iszAxis()?0.5:0.5),
+	    		linked.getCenter(),
 	            !mirrored?(geom2.iszAxis()?PortalDirection.EAST:PortalDirection.NORTH):(geom2.iszAxis()?PortalDirection.WEST:PortalDirection.SOUTH)
 	    );
 	    

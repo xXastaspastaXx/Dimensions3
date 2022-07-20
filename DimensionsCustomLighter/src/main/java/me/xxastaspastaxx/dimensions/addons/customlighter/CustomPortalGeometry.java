@@ -79,7 +79,7 @@ public class CustomPortalGeometry extends PortalGeometry {
 		}
 		
 		
-		return new CustomPortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max));
+		return new CustomPortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max).add(new Vector(0.5,0.5,0.5)));
 	}
 	
 }
