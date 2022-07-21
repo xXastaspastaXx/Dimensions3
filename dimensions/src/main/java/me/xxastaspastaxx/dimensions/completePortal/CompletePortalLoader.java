@@ -54,7 +54,7 @@ public class CompletePortalLoader {
 				CustomPortal customPortal = Dimensions.getCustomPortalManager().getCustomPortal((String) portal.get("customPortal"));
 				World world = Bukkit.getWorld((String) portal.get("world"));
 				Location loc = new Location(world, (double) portal.get("centerX"), (double) portal.get("centerY"), (double) portal.get("centerZ"));
-				PortalGeometry geom = PortalGeometry.getPortal(customPortal, loc);
+				PortalGeometry geom = PortalGeometry.getPortalGeometry().getPortal(customPortal, loc);
 				if (geom==null) continue;
 				
 				CompletePortal completePortal = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, world, geom), null, CustomPortalIgniteCause.LOAD_PORTAL, null);

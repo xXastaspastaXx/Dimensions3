@@ -115,9 +115,6 @@ public class CompletePortal {
 		
 		Location teleportLocation = destination.getCenter().clone();
 		teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
-		boolean zAxis = destination.getPortalGeometry().iszAxis();
-		
-		
 		
 		destination.pushToHold(en);
 		
@@ -164,30 +161,17 @@ public class CompletePortal {
 		
 		if (destination==null) {
 			if (!buildNewPortal) return null;
+			boolean zAxis = portalGeometry.iszAxis();
 			byte width = portalGeometry.getPortalWidth();
 			byte height = portalGeometry.getPortalHeight();
-			boolean zAxis = portalGeometry.iszAxis();
 
 			//TODO find best location
 			Location checkLocation = getSafeLocation(newLocation, zAxis, destinationWorld, height, width);
 			if (checkLocation!=null) newLocation = checkLocation;
 			
+			portalGeometry.buildPortal(newLocation, destinationWorld, customPortal);
 			
-			double maxY = (newLocation.getY()+height);
-			double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+width);
-			
-			for (double y=newLocation.getY();y<=maxY;y++) {
-				for (double side=(zAxis?newLocation.getZ():newLocation.getX());side<=maxSide;side++) {
-					Block block = new Location(destinationWorld, zAxis?newLocation.getX():side, y, !zAxis?newLocation.getZ():side).getBlock();
-					if ((y==newLocation.getY() || y==maxY) || ((side==(zAxis?newLocation.getZ():newLocation.getX())) || side==maxSide)) {
-						block.setBlockData(customPortal.getAxisOrFace().getNewData(customPortal.getOutsideMaterial().createBlockData()));
-					} else {
-						block.setType(Material.AIR);
-					}
-				}
-			}
-			
-			PortalGeometry geom = PortalGeometry.getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
+			PortalGeometry geom = PortalGeometry.getPortalGeometry().getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
 			if (geom==null) return null;
 			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL, null);
 			if (destination==null) return null;

@@ -40,6 +40,8 @@ public class DimensionsStylishPortals extends DimensionsAddon implements Listene
 	
 	//private Plugin pl;
 	
+	public static DimensionsStylishPortals instance;
+	
 	public DimensionsStylishPortals() {
 		super("DimensionsStylishPortalsAddon", "3.0.0", "Give style to your portals", DimensionsAddonPriority.NORMAL);
 	}
@@ -47,11 +49,16 @@ public class DimensionsStylishPortals extends DimensionsAddon implements Listene
 	@Override
 	public void onEnable(Dimensions pl) {
 		//this.pl = pl;
+			
+		DimensionsStylishPortals.instance = this;
+		
+		Dimensions.getCommandManager().registerCommand("Portal commands", new StylishPortalCreateCommand("blockData", "", new String[0], "Get the string block data of the block you are looking at", "", true, this));
+		
 		
 		Bukkit.getPluginManager().registerEvents(this, pl);
 	}
 	
-	
+	/*	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onPortalIgnite(CustomPortalIgniteEvent e) {
 
@@ -133,7 +140,7 @@ public class DimensionsStylishPortals extends DimensionsAddon implements Listene
 		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER, item);
 		
 	}
-	
+	*/
 	
 
 	@Override
@@ -143,7 +150,9 @@ public class DimensionsStylishPortals extends DimensionsAddon implements Listene
 		//List<String> insideStyle = portalConfig.getStringList("Addon.StylishPortal.InsideStyle");
 		if (frameStyle.size()==0) return;
 		
-		setOption(portal, "frameStyle", new FrameStyle(frameStyle));
+		FrameStyle style = new FrameStyle(frameStyle);
+		setOption(portal, "frameStyle", style);
+		PortalGeometry.setCustomGeometry(portal, new CustomPortalGeometry(null, null, null, null, false, null, style));
 		//options.put(portal, new AddonOptions(frameStyle, disabledWorlds, portalDiameters[3], portalDiameters[2], worldHeight[0], worldHeight[1],portalDiameters[1],portalDiameters[0],portalConfig.getStringList("Entities.Spawning.List").size()!=0,buildExitPortal));
 		
 		return;

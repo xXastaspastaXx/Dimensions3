@@ -157,7 +157,7 @@ public class DimensionsAddonManager {
 			}
 		}
 		
-	    if (unload(addo)) {
+	    /*if (unload(addo)) {
 	    	try {
 		    	DimensionsAddon addon = loader.load(jarFiles.get(addo), DimensionsAddon.class);
 				DimensionsDebbuger.debug("Loading addon: "+addon.getName()+" v"+addon.getVersion(), DimensionsDebbuger.MEDIUM);
@@ -170,7 +170,8 @@ public class DimensionsAddonManager {
 				DimensionsDebbuger.debug("Could not load addon "+jarFiles.get(addo).getName()+". More info bellow:", DimensionsDebbuger.HIGH);
 				e.printStackTrace();
 	    	}
-	    }
+	    }*/
+		addo.resetOptions();
 	    
 		
 	}

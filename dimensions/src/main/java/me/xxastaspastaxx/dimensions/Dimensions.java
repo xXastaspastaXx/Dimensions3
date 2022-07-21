@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddonManager;
+import me.xxastaspastaxx.dimensions.commands.DimensionsCommandManager;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortalManager;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalManager;
 import me.xxastaspastaxx.dimensions.listener.PortalListener;
@@ -11,6 +12,7 @@ import me.xxastaspastaxx.dimensions.listener.PortalListener;
 public class Dimensions extends JavaPlugin {
 	
 	private static Dimensions instance;
+	private static DimensionsCommandManager commandManager;
 	private static DimensionsAddonManager addonsManager;
 	private static CompletePortalManager completePortalManager;
 	private static CustomPortalManager customPortalManager;
@@ -27,6 +29,8 @@ public class Dimensions extends JavaPlugin {
 	public void onEnable() {
 		
 		DimensionsSettings.setDefaultWorld();
+
+		commandManager = new DimensionsCommandManager(this);
 		
 		addonsManager.enableAddons();
 		
@@ -48,12 +52,27 @@ public class Dimensions extends JavaPlugin {
 		}, 1);
 	}
 	
+	public void reload() {
+		completePortalManager.save();
+		
+		
+		
+		new DimensionsSettings(this);
+		DimensionsSettings.setDefaultWorld();
+
+
+		commandManager = new DimensionsCommandManager(this);
+		addonsManager.reloadAddon(null);
+		customPortalManager.reload();
+		completePortalManager.loadAll();
+	}
+	
 	public void onDisable() {
 		addonsManager.onDisable();
 		completePortalManager.save();
 	}
 	
-	public static JavaPlugin getInstance() {
+	public static Dimensions getInstance() {
 		return instance;
 	}
 	
@@ -67,6 +86,10 @@ public class Dimensions extends JavaPlugin {
 	
 	public static DimensionsAddonManager getAddonManager() {
 		return addonsManager;
+	}
+	
+	public static DimensionsCommandManager getCommandManager() {
+		return commandManager;
 	}
 	
 }

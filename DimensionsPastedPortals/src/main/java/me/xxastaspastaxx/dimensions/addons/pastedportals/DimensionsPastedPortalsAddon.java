@@ -110,7 +110,7 @@ public class DimensionsPastedPortalsAddon extends DimensionsAddon implements Lis
 				                	
 				                	CustomPortal portal = Dimensions.getCustomPortalManager().getCustomPortal(signData.getLine(1));
 				                	if (portal!=null) {
-				                		PortalGeometry temp = PortalGeometry.getPortal(portal, block.getLocation());
+				                		PortalGeometry temp = PortalGeometry.getPortalGeometry().getPortal(portal, block.getLocation());
 				                		if (temp!=null)
 				                			Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, block.getWorld(), temp), null, CustomPortalIgniteCause.PLUGIN, null);
 				                	}

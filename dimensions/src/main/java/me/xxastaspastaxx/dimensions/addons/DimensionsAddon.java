@@ -10,7 +10,7 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 
 public abstract class DimensionsAddon {
-
+	
 	private String addonName;
 	private String addonVersion;
 	private String addonDescription;
@@ -74,6 +74,11 @@ public abstract class DimensionsAddon {
 	public abstract boolean needsUpdate() throws UnsupportedEncodingException, IOException;
 
 	public abstract String getUpdateJarURL();
+
+	public void resetOptions() {
+		addonOptions.clear();
+		
+	}
 
 
 

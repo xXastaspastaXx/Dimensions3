@@ -1,6 +1,9 @@
 package me.xxastaspastaxx.dimensions.completePortal;
 
+import java.util.HashMap;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -9,6 +12,8 @@ import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 
 public class PortalGeometry {
+	
+	private static HashMap<CustomPortal, PortalGeometry> customGeometry = new HashMap<CustomPortal, PortalGeometry>();
 	
 	private Vector min;
 	private Vector max;
@@ -23,8 +28,11 @@ public class PortalGeometry {
 	
 	private boolean zAxis;
 
-	protected PortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
+	public static PortalGeometry instance;
+	
+	public PortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
 			boolean zAxis, Vector center) {
+		if (min==null) return;
 		this.min = min;
 		this.max = max;
 		this.insideMin = insideMin;
@@ -67,19 +75,31 @@ public class PortalGeometry {
 	public byte getPortalHeight() {
 		return portalHeight;
 	}
+	
+	public static void setCustomGeometry(CustomPortal portal, PortalGeometry geom) {
+		customGeometry.put(portal, geom);
+	}
+	
+	public static PortalGeometry getPortalGeometry() {
+		return instance;
+	}
+	
+	public PortalGeometry getPortal(CustomPortal customPortal, Location loc) {
 
-	public static PortalGeometry getPortal(CustomPortal customPortal, Location loc) {
-		
-		loc = loc.getBlock().getLocation();
-		
+		 if (customGeometry.containsKey(customPortal)) {
+			return customGeometry.get(customPortal).getPortal(customPortal, loc);
+		 }
+		 
+		 loc = loc.getBlock().getLocation();
+			
 		boolean zAxis = false;
-		
+			
 		Vector min = new Vector();
 		Vector max = new Vector();
-		
+			
 		Location minLocation = loc.clone();
 		Location maxLocation = loc.clone();
-		
+			
 		for (int i = 0;i<customPortal.getMaximumHeight();i++) {
 			if (!customPortal.isPortalBlock(minLocation.getBlock())) minLocation.add(0,-1,0);
 			if (!customPortal.isPortalBlock(maxLocation.getBlock())) maxLocation.add(0,1,0);
@@ -104,8 +124,7 @@ public class PortalGeometry {
 				if (!customPortal.isPortalBlock(minLocation.getBlock())) minLocation.add(0,0,-1);
 				if (!customPortal.isPortalBlock(maxLocation.getBlock())) maxLocation.add(0,0,1);
 			}
-
-			if (!customPortal.isPortalBlock(minLocation.getBlock()) || !customPortal.isPortalBlock(maxLocation.getBlock())) return null;
+				if (!customPortal.isPortalBlock(minLocation.getBlock()) || !customPortal.isPortalBlock(maxLocation.getBlock())) return null;
 			zAxis = true;
 		}
 		
@@ -131,7 +150,7 @@ public class PortalGeometry {
 		}
 		
 		
-		return new PortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max).add(new Vector(0.5,0.5,0.5)));
+		return new PortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max).add(new Vector(0.5,0.5,0.5)));		 
 	}
 
 	public boolean isInside(Location location, boolean outside, boolean corner) {
@@ -164,5 +183,22 @@ public class PortalGeometry {
 
 		return false;
 	}
-	
+
+	public void buildPortal(Location newLocation, World destinationWorld, CustomPortal customPortal) {
+		
+		double maxY = (newLocation.getY()+portalHeight);
+		double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+portalWidth);
+		
+		for (double y=newLocation.getY();y<=maxY;y++) {
+			for (double side=(zAxis?newLocation.getZ():newLocation.getX());side<=maxSide;side++) {
+				Block block = new Location(destinationWorld, zAxis?newLocation.getX():side, y, !zAxis?newLocation.getZ():side).getBlock();
+				if ((y==newLocation.getY() || y==maxY) || ((side==(zAxis?newLocation.getZ():newLocation.getX())) || side==maxSide)) {
+					block.setBlockData(customPortal.getAxisOrFace().getNewData(customPortal.getOutsideMaterial().createBlockData()));
+				} else {
+					block.setType(Material.AIR);
+				}
+			}
+		}
+		
+	}
 }

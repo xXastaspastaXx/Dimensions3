@@ -8,27 +8,17 @@ import java.net.URL;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
-import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddonPriority;
+import me.xxastaspastaxx.dimensions.addons.customlighter.commands.CustomFrameCommand;
+import me.xxastaspastaxx.dimensions.addons.customlighter.commands.CustomInsideCommand;
+import me.xxastaspastaxx.dimensions.addons.customlighter.commands.CustomLighterCommand;
 import me.xxastaspastaxx.dimensions.addons.customlighter.framemanager.CustomItemsFrameManager;
 import me.xxastaspastaxx.dimensions.addons.customlighter.framemanager.FrameManager;
 import me.xxastaspastaxx.dimensions.addons.customlighter.framemanager.ItemsAdderFrameManager;
@@ -54,13 +44,23 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 	
 	//private Plugin pl;
 	
+	public static DimensionsCustomLighter instance;
+
+	private HashMap<CustomPortal, YamlConfiguration> configs = new HashMap<CustomPortal, YamlConfiguration>();
+	
 	public DimensionsCustomLighter() {
 		super("DimensionsCustomLighterAddon", "3.0.0", "Custom lighters and blocks", DimensionsAddonPriority.NORMAL);
+		DimensionsCustomLighter.instance = this;
 	}
 	
 	@Override
 	public void onEnable(Dimensions pl) {
 		//this.pl = pl;
+		
+		Dimensions.getCommandManager().registerCommand("Portal commands", new CustomLighterCommand("setLighter", "<portal>", new String[0], "Set the vanilla lighter for the portal", "", true, this));
+		Dimensions.getCommandManager().registerCommand("Portal commands", new CustomFrameCommand("setFrameBlock", "<portal>", new String[0], "Set the vanilla frame blockdata for the portal", "", true, this));
+		Dimensions.getCommandManager().registerCommand("Portal commands", new CustomInsideCommand("setInsideBlock", "<portal>", new String[0], "Set the vanilla inside blockdata for the portal", "", true, this));
+	
 		
 		Bukkit.getPluginManager().registerEvents(this, pl);
 	}
@@ -70,38 +70,19 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 
 		CompletePortal complete = e.getCompletePortal();
 		CustomPortal portal = complete.getCustomPortal();
-		Object manager = getOption(portal, "customFrame");
+		Object manager = getOption(portal, "customItem");
 		if (manager==null) return;
 		
-		FrameManager frameManager = (FrameManager) manager;
-		
-		if (!(complete.getPortalGeometry() instanceof CustomPortalGeometry)) {
-			if (e.getCause()==CustomPortalIgniteCause.EXIT_PORTAL || e.getCause()==CustomPortalIgniteCause.LOAD_PORTAL) {
-				
-				PortalGeometry portalGeometry = complete.getPortalGeometry();
-				Vector min = portalGeometry.getMin();
-				Vector max = portalGeometry.getMax();
-				boolean zAxis = portalGeometry.iszAxis();
-				
-				for (double y=min.getY();y<=max.getY();y++) {
-					for (double side=zAxis?min.getZ():min.getX();side<=(zAxis?max.getZ():max.getX());side++) {
-						Block block = new Location(complete.getWorld(), zAxis?min.getX():side, y, !zAxis?min.getZ():side).getBlock();
-						if ((y==min.getY() || y==max.getY()) || ((side==(zAxis?min.getZ():min.getX())) || side==(zAxis?max.getZ():max.getX()))) {
-							frameManager.placeBlock(block);
-						} else {
-							block.setType(Material.AIR);
-						}
-						
-					}
-				}
-				
-				PortalGeometry geom = CustomPortalGeometry.getPortal(portal, complete.getCenter(), frameManager);
-				if (geom==null) return;
-				e.replaceCompletePortal(Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, complete.getWorld(), geom), null, e.getCause(), null));
-			} else {
+		if (e.getLighter()==null) {
+			if (e.getCause()==CustomPortalIgniteCause.PLAYER)
 				e.setCancelled(true);
-			}
+			return;
 		}
+		
+		ItemManager itemManager = (ItemManager) manager;
+		
+		if (!itemManager.isAccepted(e.getLighter())) e.setCancelled(true);
+
 	}
 	/*
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -115,7 +96,7 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 		if (e.getDestinationPortal()==null)
 			complete.getDestinationPortal(true, null);
 	}*/
-	
+	/*
 	HashMap<Player,Long> clicked = new HashMap<Player,Long>();
 	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -162,9 +143,9 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 				clicked.remove(p);
 			}
 		}
-	}
+	}*/
 	
-	public CompletePortal tryIgnite(CustomPortal portal, Player player, ItemStack item, Location loc) {
+	/*public CompletePortal tryIgnite(CustomPortal portal, Player player, ItemStack item, Location loc) {
 		
 		Object manager = getOption(portal, "customItem");
 		if (manager!=null) {
@@ -177,12 +158,12 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 			}
 		}
 		
-		PortalGeometry temp = CustomPortalGeometry.getPortal(portal, loc, (FrameManager) getOption(portal, "customFrame"));
+		PortalGeometry temp = PortalGeometry.getPortalGeometry().getPortal(portal, loc);
 		if (temp==null) return null;
 		
 		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER, item);
 		
-	}
+	}*/
 	
 
 	@Override
@@ -211,6 +192,7 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 			if (frameManagerString.equals("ORAXEN")) frameManager = new OraxenFrameManager(Integer.parseInt(frame));
 			if (frameManagerString.equals("CUSTOMITEMS")) frameManager = new CustomItemsFrameManager(frame);
 			setOption(portal, "customFrame", frameManager);
+			PortalGeometry.setCustomGeometry(portal, new CustomPortalGeometry(null, null, null, null, false, null, frameManager));
 		}
 		
 		
@@ -227,6 +209,7 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 			portal.setInsideBlockData(insideManager.getBlockData());
 		}
 		
+		configs.put(portal, portalConfig);
 	}
 	
 	@Override
@@ -245,6 +228,10 @@ public class DimensionsCustomLighter extends DimensionsAddon implements Listener
 		String id = "1_6qrtPMf3adkZJsKav7M4imQjbpUO-5B";
 		
 		return "https://drive.google.com/uc?id="+id+"&export=download";
+	}
+
+	public YamlConfiguration getPortalConfig(CustomPortal portal) {
+		return configs.get(portal);
 	}
 	
 }

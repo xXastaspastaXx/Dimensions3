@@ -24,6 +24,7 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 import me.xxastaspastaxx.dimensions.AxisOrFace;
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
+import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
 public class CustomPortalLoader {
 	
@@ -58,6 +59,8 @@ public class CustomPortalLoader {
 		
 		File portalFolder = new File(DIRECTORY_PATH);
 		if (!portalFolder.exists()) portalFolder.mkdir();
+		
+		PortalGeometry.instance = new PortalGeometry(null, null, null, null, false, null);
 		
 		for (File f : PORTALS_DIRECTORY.listFiles()) {
 			String portalID = f.getName().replace(".yml", "");

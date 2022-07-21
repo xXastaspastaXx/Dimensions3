@@ -35,5 +35,12 @@ public class CustomPortalManager {
 		}
 		return null;
 	}
+
+
+
+	public void reload() {
+		customPortals.clear();
+		customPortals.addAll((new CustomPortalLoader()).loadAll());
+	}
 	
 }

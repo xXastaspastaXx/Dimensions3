@@ -31,7 +31,7 @@ private Plugin pl;
 	HashMap<CompletePortal, ArrayList<Integer>> tasks = new HashMap<CompletePortal, ArrayList<Integer>>();
 	
 	public DimensionsParticles() {
-		super("DimensionsUnbreakableAddon", "3.0.0", "Unbreakable portals", DimensionsAddonPriority.NORMAL);
+		super("DimensionsParticlesAddon", "3.0.0", "Particles!!!", DimensionsAddonPriority.NORMAL);
 	}
 	
 	@Override

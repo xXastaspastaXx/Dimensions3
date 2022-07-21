@@ -67,7 +67,7 @@ public class WorldEditLogger extends AbstractLoggingExtent {
 	                	if (portal==null) return;
 	                	
 	                	if (portal!=null) {
-	                		PortalGeometry temp = PortalGeometry.getPortal(portal, pastedBlock.getLocation());
+	                		PortalGeometry temp = PortalGeometry.getPortalGeometry().getPortal(portal, pastedBlock.getLocation());
 	                		if (temp!=null)
 	                			Dimensions.getCompletePortalManager().createNew(new CompletePortal(portal, pastedBlock.getWorld(), temp), p, CustomPortalIgniteCause.PLUGIN, null);
 	                	}

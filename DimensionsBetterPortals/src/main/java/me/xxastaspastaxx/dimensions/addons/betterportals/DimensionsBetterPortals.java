@@ -62,7 +62,7 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 	
 	@Override
 	public void onEnable(Dimensions pl) {
-		
+		Dimensions.getCommandManager().registerCommand("Portal commands", new MirrorPortalCommand("mirror", "", new String[0], "Make the portal look the other way", "", true, this));
 		try {
             this.bpAPI = BetterPortalsAPI.get();
     	    /*bpAPI.addPortalTeleportPredicate(new PortalPredicate() {

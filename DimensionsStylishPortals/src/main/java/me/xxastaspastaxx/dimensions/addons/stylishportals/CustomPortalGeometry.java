@@ -1,6 +1,7 @@
 package me.xxastaspastaxx.dimensions.addons.stylishportals;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -11,12 +12,15 @@ import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 
 public class CustomPortalGeometry extends PortalGeometry {
-	private CustomPortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
-			boolean zAxis, Vector center) {
+	FrameStyle frameManager;
+	
+	CustomPortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
+			boolean zAxis, Vector center, FrameStyle frameManager) {
 		super(min, max, insideMin, insideMax, zAxis, center);
+		this.frameManager = frameManager;
 	}
-
-	public static CustomPortalGeometry getPortal(CustomPortal customPortal, Location loc, FrameStyle frameManager) {
+	
+	public CustomPortalGeometry getPortal(CustomPortal customPortal, Location loc) {
 		
 		loc = loc.getBlock().getLocation();
 		
@@ -80,7 +84,14 @@ public class CustomPortalGeometry extends PortalGeometry {
 		if (!frameManager.isPortal(world, min,max, zAxis)) return null;
 		
 		
-		return new CustomPortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max).add(new Vector(0.5,0.5,0.5)));
+		return new CustomPortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max).add(new Vector(0.5,0.5,0.5)), frameManager);
+	}
+	
+	@Override
+	public void buildPortal(Location newLocation, World destinationWorld, CustomPortal customPortal) {
+		
+		frameManager.setPortal(newLocation, destinationWorld, getMin(), getMax(), iszAxis());
+		
 	}
 	
 }
