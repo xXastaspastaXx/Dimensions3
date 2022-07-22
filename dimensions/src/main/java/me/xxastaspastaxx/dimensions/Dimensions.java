@@ -27,8 +27,6 @@ public class Dimensions extends JavaPlugin {
 	}
 	
 	public void onEnable() {
-		
-		DimensionsSettings.setDefaultWorld();
 
 		commandManager = new DimensionsCommandManager(this);
 		
@@ -46,6 +44,8 @@ public class Dimensions extends JavaPlugin {
 			
 			@Override
 			public void run() {
+				
+				DimensionsSettings.setDefaultWorld();
 				completePortalManager.loadAll();
 				
 			}

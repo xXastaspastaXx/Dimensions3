@@ -23,6 +23,10 @@ public abstract class PortalEntity {
 		location.getWorld().spawnParticle(Particle.REDSTONE, location.getX()+0.5f,location.getY()+0.5f,location.getZ()+0.5f, 3, 0.5,0.5,0.5,new Particle.DustOptions(color,2));
 	}
 	
+	public void emitLight() {
+		
+	}
+	
 	public Location getLocation() {
 		return location;
 	}

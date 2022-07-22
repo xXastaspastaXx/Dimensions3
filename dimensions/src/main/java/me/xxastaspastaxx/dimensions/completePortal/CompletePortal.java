@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,23 +27,24 @@ public class CompletePortal {
 	private CustomPortal customPortal;
 
 	private PortalGeometry portalGeometry;
-	World world;
-	int chunkX;
-	int chunkZ;
+	private World world;
+	private int chunkX;
+	private int chunkZ;
 	
-	int particlesTask;
+	private int particlesTask;
 	
 	//We store the last linked world in case the plugin needs to return the player to the world he came from but for some reason the portal is broken
 	private CompletePortal linkedPortal;
 	private World lastLinkedWorld;
 	
 	//The fake falling block entities are stored here in order to spawn.despawn them
-	ArrayList<PortalEntity> spawnedEntities = new ArrayList<PortalEntity>();
+	private ArrayList<PortalEntity> spawnedEntities = new ArrayList<PortalEntity>();
 	
 	//We keep a list of players that have been teleported to the portal in order to not spam teleport them around
-	ArrayList<Entity> hold = new ArrayList<Entity>();
+	private ArrayList<Entity> hold = new ArrayList<Entity>();
+	private HashMap<Entity, Integer> queue = new HashMap<Entity, Integer>();
 	
-	HashMap<String, Object> tags = new HashMap<String, Object>();
+	private HashMap<String, Object> tags = new HashMap<String, Object>();
 	
 	public CompletePortal(CustomPortal customPortal, World world, PortalGeometry portalGeometry) {
 		this.customPortal = customPortal;
@@ -114,21 +116,31 @@ public class CompletePortal {
 	public void handleEntity(Entity en) {
 		if (hold.contains(en)) return;
 		
-		CustomPortalUseEvent useEvent = new CustomPortalUseEvent(this, en, getDestinationPortal(false, null));
-		Bukkit.getPluginManager().callEvent(useEvent);
+		int delay = customPortal.getTeleportDelay()*20;
+		if ((en instanceof Player) && (((Player) en).getGameMode()==GameMode.CREATIVE || ((Player) en).getGameMode()==GameMode.SPECTATOR)) delay = 0;
 		
-		if (useEvent.isCancelled()) return; 
-		CompletePortal destination = useEvent.getDestinationPortal();
-		
-		//If no portal was put as a destination from other sources, we create our own
-		if (destination==null) destination = getDestinationPortal(true, null);
-		
-		Location teleportLocation = destination.getCenter().clone();
-		teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
-		
-		destination.pushToHold(en);
-		
-		en.teleport(teleportLocation);
+		queue.put(en, Bukkit.getScheduler().scheduleSyncDelayedTask(Dimensions.getInstance(), new Runnable() {
+			
+			@Override
+			public void run() {
+				CustomPortalUseEvent useEvent = new CustomPortalUseEvent(CompletePortal.this, en, getDestinationPortal(false, null));
+				Bukkit.getPluginManager().callEvent(useEvent);
+				
+				if (useEvent.isCancelled()) return; 
+				CompletePortal destination = useEvent.getDestinationPortal();
+				
+				//If no portal was put as a destination from other sources, we create our own
+				if (destination==null) destination = getDestinationPortal(true, null);
+				
+				Location teleportLocation = destination.getCenter().clone();
+				teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
+				
+				destination.pushToHold(en);
+				
+				en.teleport(teleportLocation);
+				removeFromHold(en);
+			}
+		}, delay));
 		
 		//customPortal.usePortal(en, this);
 	}
@@ -301,16 +313,18 @@ public class CompletePortal {
 		if (getTag("hidePortalInside") != null) return;
 		if (p==null) {
 			Bukkit.getScheduler().cancelTask(particlesTask);
-			particlesTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Dimensions.getInstance(), new Runnable() {
-				
-				@Override
-				public void run() {
-					if (getTag("hidePortalParticles")!=null) return;
-					for (PortalEntity en : spawnedEntities) {
-						en.emitParticles(customPortal.getParticlesColor());
+			if (customPortal.isEnableParticles()) {
+				particlesTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Dimensions.getInstance(), new Runnable() {
+					
+					@Override
+					public void run() {
+						if (getTag("hidePortalParticles")!=null) return;
+						for (PortalEntity en : spawnedEntities) {
+							en.emitParticles(customPortal.getParticlesColor());
+						}
 					}
-				}
-			}, 20, 20);
+				}, 20, 20);
+			}
 			
 			for (Entity player : world.getNearbyEntities(getCenter(), 16*Bukkit.getViewDistance(), 255, 16*Bukkit.getViewDistance(), (player) -> player instanceof Player)) {
 				fill((Player) player);
@@ -348,10 +362,15 @@ public class CompletePortal {
 	}
 
 	public boolean hasInHold(Player player) {
-		return hold.contains(player);
+		return hold.contains(player) || queue.containsKey(player);
 	}
 	public void removeFromHold(Entity en) {
 		hold.remove(en);
+		try {
+			Bukkit.getScheduler().cancelTask(queue.remove(en));
+		} catch (NullPointerException e) {
+			
+		}
 	}
 
 	public void setTag(String key, Object value) {

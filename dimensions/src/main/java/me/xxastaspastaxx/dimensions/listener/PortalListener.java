@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -39,6 +40,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -105,13 +107,30 @@ public class PortalListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPlayerWalk(PlayerMoveEvent e) {
-		if (e.getTo().getBlockX() == e.getFrom().getBlockX() && e.getTo().getBlockY() == e.getFrom().getBlockY() && e.getTo().getBlockZ() == e.getFrom().getBlockZ()) return;
-		Player p = e.getPlayer();
+		handlePositionChange(e.getPlayer(), e.getFrom(), e.getTo());
+		
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onPortalTeleport(PlayerTeleportEvent e) {
+		handlePositionChange(e.getPlayer(), e.getFrom(), e.getTo());
+	}
+	
+	private void handlePositionChange(Player p, Location from, Location to) {
+		if (to.getBlockX() == from.getBlockX() && to.getBlockY() == from.getBlockY() && to.getBlockZ() == from.getBlockZ()) return;
 		
 
-		CompletePortal complTo = Dimensions.getCompletePortalManager().getCompletePortal(e.getTo(), false, false);
+		CompletePortal complTo = Dimensions.getCompletePortalManager().getCompletePortal(to, false, false);
 		
-		CompletePortal complFrom = Dimensions.getCompletePortalManager().getCompletePortal(e.getFrom(), false, false);
+		CompletePortal complFrom = Dimensions.getCompletePortalManager().getCompletePortal(from, false, false);
+		
+		if (complTo!=null) {
+			p.sendBlockChange(to, DimensionsUtils.getNetherPortalEffect(complTo.getPortalGeometry().iszAxis()));
+		}
+		if (complFrom!=null) {
+			p.sendBlockChange(from, from.getBlock().getBlockData());
+		}
+		
 		if (complFrom!=null && complFrom.hasInHold(p)) {
 
 			if (complTo!=null && complFrom.equals(complTo)) return;
@@ -120,9 +139,7 @@ public class PortalListener implements Listener {
 		
 		if (complTo!=null) complTo.handleEntity(p);
 		
-			
 	}
-	
 
 	HashMap<Player,Long> clicked = new HashMap<Player,Long>();
 	

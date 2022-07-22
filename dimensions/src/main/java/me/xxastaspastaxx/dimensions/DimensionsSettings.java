@@ -9,7 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class DimensionsSettings {
 	
-	private static final double configVersion = 0.5;
+	private static final double configVersion = 0.6;
 	
 	public static int searchRadius = 128;
 	public static int safeSpotSearchRadius = 16;
@@ -17,7 +17,7 @@ public class DimensionsSettings {
 	public static int debugLevel = 2;
 	//public static int teleportDelay = 4; TODO per portla
 	//public static boolean enableParticles = false; TODO per portla
-	//public static boolean enableNetherPortalEffect = true; TODO per portla
+	public static boolean enableNetherPortalEffect = true; //TODO per portla
 	// public static boolean enableMobsTeleportation = true; TODO per portla
 	//public static boolean enableEntitiesTeleportation = true; TODO per portla
 	public static boolean checkForUpdatesOnStartup = false;

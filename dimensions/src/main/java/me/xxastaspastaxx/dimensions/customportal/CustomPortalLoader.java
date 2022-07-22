@@ -112,6 +112,10 @@ public class CustomPortalLoader {
 			
 			List<String> disabledWorlds = portalConfig.getStringList("Options.DisabledWorlds");
 			
+
+			int teleportDelay = portalConfig.getInt("Options.TeleportDelay", 4);
+			boolean enableParticles = portalConfig.getBoolean("Options.EnableParticles", true);
+			
 			HashMap<EntityType,EntityType> entityTransformation = new HashMap<EntityType,EntityType>();
 			for (String entity : portalConfig.getStringList("Entities.Transformation")) {
 				String[] spl = entity.toUpperCase().split("->");
@@ -127,7 +131,7 @@ public class CustomPortalLoader {
 			}
 			
 			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
-					worldName, ratio, buildExitPortal, spawnOnAir, disabledWorlds, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
+					worldName, ratio, buildExitPortal, spawnOnAir, disabledWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
 			portal.setInsideBlockData(insideMaterial.createBlockData());
 			for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
 				addon.registerPortal(portalConfig, portal);

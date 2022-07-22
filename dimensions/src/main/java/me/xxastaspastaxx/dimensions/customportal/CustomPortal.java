@@ -46,10 +46,13 @@ public class CustomPortal {
 	private float worldRatio;
 	private float worldRatioReturn;
 	
-	boolean buildExitPortal;
-	boolean spawnOnAir;
+	private boolean buildExitPortal;
+	private boolean spawnOnAir;
 	
-	List<String> disabledWorldsList;
+	private List<String> disabledWorldsList;
+	
+	private int teleportDelay;
+	private boolean enableParticles;
 	
 	HashMap<EntityType,EntityType> entityTransformationList;
 	int spawnDelayMin;
@@ -58,7 +61,7 @@ public class CustomPortal {
 	public CustomPortal(String portalId, String displayName, boolean enabled, Material outsideMaterial, AxisOrFace outsideBlockDir,
 			Material insideMaterial, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
 			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, float worldRatio, boolean buildExitPortal, boolean spawnOnAir,
-			List<String> disabledWorldsList, HashMap<EntityType, EntityType> entityTransformationList,
+			List<String> disabledWorldsList, int teleportDelay, boolean enableParticles, HashMap<EntityType, EntityType> entityTransformationList,
 			int spawnDelayMin, int spawnDelayMax, HashMap<EntityType, Integer> entitySpawnList) {
 		this.portalId = portalId;
 		this.displayName = displayName;
@@ -79,6 +82,8 @@ public class CustomPortal {
 		this.buildExitPortal = buildExitPortal;
 		this.spawnOnAir = spawnOnAir;
 		this.disabledWorldsList = disabledWorldsList;
+		this.teleportDelay = teleportDelay;
+		this.enableParticles = enableParticles;
 		this.entityTransformationList = entityTransformationList;
 		this.spawnDelayMin = spawnDelayMin;
 		this.spawnDelayMax = spawnDelayMax;
@@ -152,6 +157,15 @@ public class CustomPortal {
 	public List<String> getDisabledWorldsList() {
 		return disabledWorldsList;
 	}
+	
+	public int getTeleportDelay() {
+		return teleportDelay;
+	}
+
+	public boolean isEnableParticles() {
+		return enableParticles;
+	}
+
 	public HashMap<EntityType, EntityType> getEntityTransformationList() {
 		return entityTransformationList;
 	}
