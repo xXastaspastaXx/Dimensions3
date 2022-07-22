@@ -53,6 +53,7 @@ public class Dimensions extends JavaPlugin {
 	}
 	
 	public void reload() {
+		addonsManager.unloadAll();
 		completePortalManager.save();
 		
 		
@@ -60,10 +61,12 @@ public class Dimensions extends JavaPlugin {
 		new DimensionsSettings(this);
 		DimensionsSettings.setDefaultWorld();
 
-
 		commandManager = new DimensionsCommandManager(this);
-		addonsManager.reloadAddon(null);
-		customPortalManager.reload();
+
+		addonsManager.enableAddons();
+
+		customPortalManager = new CustomPortalManager(this);
+		completePortalManager = new CompletePortalManager(this);
 		completePortalManager.loadAll();
 	}
 	

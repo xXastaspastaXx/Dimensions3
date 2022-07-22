@@ -30,6 +30,8 @@ public class CompletePortal {
 	int chunkX;
 	int chunkZ;
 	
+	int particlesTask;
+	
 	//We store the last linked world in case the plugin needs to return the player to the world he came from but for some reason the portal is broken
 	private CompletePortal linkedPortal;
 	private World lastLinkedWorld;
@@ -69,6 +71,14 @@ public class CompletePortal {
 				spawnedEntities.add(entity);
 			}
 		}
+	}
+	
+	public CompletePortal(CustomPortal customPortal, World world, PortalGeometry portalGeometry, CompletePortal linked) {
+		this(customPortal, world, portalGeometry);
+		
+		if (linked==null) return;
+		setLinkedPortal(linked);
+		linked.setLinkedPortal(this);
 	}
 	
 	public CustomPortal getCustomPortal() {
@@ -290,6 +300,18 @@ public class CompletePortal {
 	public void fill(Player p) {
 		if (getTag("hidePortalInside") != null) return;
 		if (p==null) {
+			Bukkit.getScheduler().cancelTask(particlesTask);
+			particlesTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Dimensions.getInstance(), new Runnable() {
+				
+				@Override
+				public void run() {
+					if (getTag("hidePortalParticles")!=null) return;
+					for (PortalEntity en : spawnedEntities) {
+						en.emitParticles(customPortal.getParticlesColor());
+					}
+				}
+			}, 20, 20);
+			
 			for (Entity player : world.getNearbyEntities(getCenter(), 16*Bukkit.getViewDistance(), 255, 16*Bukkit.getViewDistance(), (player) -> player instanceof Player)) {
 				fill((Player) player);
 			}
@@ -303,7 +325,11 @@ public class CompletePortal {
 	}
 
 	public void destroy(Player p) {
-
+		
+		if (p==null) {
+			Bukkit.getScheduler().cancelTask(particlesTask);
+		}
+		
 		for (PortalEntity en : spawnedEntities) {
 			if (p==null)
 				en.destroyBroadcast();

@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 public class FrameStyle {
@@ -80,10 +81,18 @@ public class FrameStyle {
 		for (int x = 0;x<=portalWidth;x++) {
 			top.add(new Location(world, !zAxis?newLocation.getX()+x:newLocation.getX(),newLocation.getY()+portalHeight,!zAxis?newLocation.getZ():newLocation.getZ()+x).getBlock());
 		}
-		
+
 		ArrayList<Block> bottom = new ArrayList<Block>();
+		ArrayList<Block> bottom1 = new ArrayList<Block>();
+		ArrayList<Block> bottom2 = new ArrayList<Block>();
 		for (int x = 0;x<=portalWidth;x++) {
-			bottom.add(new Location(world, !zAxis?newLocation.getX()+x:newLocation.getX(),newLocation.getY(),!zAxis?newLocation.getZ():newLocation.getZ()+x).getBlock());
+			Block block = new Location(world, !zAxis?newLocation.getX()+x:newLocation.getX(),newLocation.getY(),!zAxis?newLocation.getZ():newLocation.getZ()+x).getBlock();
+			bottom.add(block);
+			
+			if (!block.getRelative(BlockFace.DOWN).getType().isSolid()) {
+				bottom1.add(block.getRelative(!zAxis?BlockFace.SOUTH:BlockFace.EAST));
+				bottom2.add(block.getRelative(!zAxis?BlockFace.NORTH:BlockFace.WEST));
+			}
 		}
 
 		ArrayList<Block> side1 = new ArrayList<Block>();
@@ -97,6 +106,10 @@ public class FrameStyle {
 		patterns[1].setPattern(side2.toArray(new Block[0]), zAxis);
 		patterns[2].setPattern(side1.toArray(new Block[0]), zAxis);
 		patterns[3].setPattern(bottom.toArray(new Block[0]), zAxis);
+		
+		if (bottom1.isEmpty()) return;
+		patterns[3].setPattern(bottom1.toArray(new Block[0]), zAxis);
+		patterns[3].setPattern(bottom2.toArray(new Block[0]), zAxis);
 		
 	}
 

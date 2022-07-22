@@ -26,9 +26,9 @@ public class ClearCommand extends DimensionsCommand {
 					Dimensions.getCompletePortalManager().removePortal(complete, CustomPortalDestroyCause.PLUGIN, null);
 				}
 			}
-			sender.sendMessage("Â§7[Â§cDimensionsÂ§7] Â§aRemoved Â§c"+args[1]+"Â§a portals");
+			sender.sendMessage("§7[§cDimensions§7] §aRemoved §c"+args[1]+"§a portals");
 		} else {
-			sender.sendMessage("Â§7[Â§cDimensionsÂ§7] Missing argument. Please use /dim "+this.getCommand()+" "+this.getArgs());
+			sender.sendMessage("§7[§cDimensions§7] Missing argument. Please use /dim "+this.getCommand()+" "+this.getArgs());
 		}
 		
 	}

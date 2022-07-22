@@ -77,7 +77,6 @@ public abstract class DimensionsAddon {
 
 	public void resetOptions() {
 		addonOptions.clear();
-		
 	}
 
 

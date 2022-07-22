@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.event.HandlerList;
@@ -146,59 +145,28 @@ public class DimensionsAddonManager {
 	public void onDisable() {
 		for (DimensionsAddon addon : loadedAddons) {
 			addon.onDisable();
+			addon.resetOptions();
 		}
-
-	}
-
-	public void reloadAddon(DimensionsAddon addo) {
-		if (addo==null) {
-			for (DimensionsAddon ad : getAddons()) {
-				reloadAddon(ad);
-			}
-		}
-		
-	    /*if (unload(addo)) {
-	    	try {
-		    	DimensionsAddon addon = loader.load(jarFiles.get(addo), DimensionsAddon.class);
-				DimensionsDebbuger.debug("Loading addon: "+addon.getName()+" v"+addon.getVersion(), DimensionsDebbuger.MEDIUM);
-				
-		    	if (addon.onLoad(pl)) {
-		    		loadedAddons.add(addon);
-		    		addon.onEnable(pl);
-			    } 
-	    	} catch (Exception | Error e) {
-				DimensionsDebbuger.debug("Could not load addon "+jarFiles.get(addo).getName()+". More info bellow:", DimensionsDebbuger.HIGH);
-				e.printStackTrace();
-	    	}
-	    }*/
-		addo.resetOptions();
-	    
 		
 	}
 
 	public void unloadAll() {
 
-		Iterator<DimensionsAddon> iter = loadedAddons.iterator();
-		while (iter.hasNext()) {
-			DimensionsAddon add = iter.next();
-			iter.remove();
-			unload(add);
+		for (DimensionsAddon addon : loadedAddons) {
+			unload(addon);
 		}
 		
 	}
 	
-	ArrayList<String> dontUnload = new ArrayList<String>(Arrays.asList(new String[] {"me.xxastaspastaxx.dimensions.listener.BaseListener", "me.xxastaspastaxx.commands.AddonCommand"}));
+	ArrayList<String> dontUnload = new ArrayList<String>(Arrays.asList(new String[] {"me.xxastaspastaxx.dimensions.listener.PortalListener", "me.xxastaspastaxx.dimensions.commands.AddonCommand"}));
 	
 	public boolean unload(DimensionsAddon plugin) {
 		plugin.onDisable();
-		plugin.onUnLoad();
-		loadedAddons.remove(plugin);
+		plugin.resetOptions();
 		
 		for (RegisteredListener r : HandlerList.getRegisteredListeners(pl)) {
 			String s = r.getListener().getClass().getName();
-			if (dontUnload.contains(s)) {
-				continue;
-			}
+			if (dontUnload.contains(s)) continue;
 			
 			HandlerList.unregisterAll(r.getListener());
 		}
@@ -212,7 +180,6 @@ public class DimensionsAddonManager {
 			DimensionsDebbuger.debug("Found new version for "+addon.getName()+". Updating addon...", DimensionsDebbuger.MEDIUM);
 		
 			addon = downloadAndExportAddon(jarFiles.get(addon).getName(), addon.getUpdateJarURL());
-			reloadAddon(addon);
 			DimensionsDebbuger.debug("Update complete for "+addon.getName()+".", DimensionsDebbuger.MEDIUM);
 		} catch (Exception e) {
 			DimensionsDebbuger.debug("Could not update", DimensionsDebbuger.MEDIUM);

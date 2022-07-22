@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
@@ -194,6 +195,12 @@ public class PortalGeometry {
 				Block block = new Location(destinationWorld, zAxis?newLocation.getX():side, y, !zAxis?newLocation.getZ():side).getBlock();
 				if ((y==newLocation.getY() || y==maxY) || ((side==(zAxis?newLocation.getZ():newLocation.getX())) || side==maxSide)) {
 					block.setBlockData(customPortal.getAxisOrFace().getNewData(customPortal.getOutsideMaterial().createBlockData()));
+					
+					//build platform
+					if (y==newLocation.getY() && !((side==(zAxis?newLocation.getZ():newLocation.getX())) || side==maxSide) && !block.getRelative(BlockFace.DOWN).getType().isSolid()) {
+						block.getRelative(!zAxis?BlockFace.NORTH:BlockFace.WEST).setBlockData(customPortal.getAxisOrFace().getNewData(customPortal.getOutsideMaterial().createBlockData()));
+						block.getRelative(!zAxis?BlockFace.SOUTH:BlockFace.EAST).setBlockData(customPortal.getAxisOrFace().getNewData(customPortal.getOutsideMaterial().createBlockData()));
+					}
 				} else {
 					block.setType(Material.AIR);
 				}

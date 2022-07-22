@@ -22,7 +22,6 @@ public class AddonCommand extends DimensionsCommand implements Listener {
 	private Inventory mainGUI;
 	private ItemStack installedAddonsItemStack;
 	private ItemStack installAddonsItemStack;
-	private ItemStack reloadAddonsItemStack;
 	
 	private Inventory installedAddonsGUI;
 	
@@ -50,13 +49,6 @@ public class AddonCommand extends DimensionsCommand implements Listener {
 		installAddonsItemStackkMeta.setLore(new ArrayList<String>(Arrays.asList(new String[] {"§7Currently unavailable"})));
 		installAddonsItemStack.setItemMeta(installAddonsItemStackkMeta);
 		mainGUI.addItem(installAddonsItemStack);
-		
-		reloadAddonsItemStack = new ItemStack(Material.BARRIER, 1);
-		ItemMeta reloadAddonsItemStackMeta = reloadAddonsItemStack.getItemMeta();
-		reloadAddonsItemStackMeta.setDisplayName("§4Reload all addons");
-		reloadAddonsItemStackMeta.setLore(new ArrayList<String>(Arrays.asList(new String[] {"§4Warning, some addons may not work after a reload"})));
-		reloadAddonsItemStack.setItemMeta(reloadAddonsItemStackMeta);
-		mainGUI.addItem(reloadAddonsItemStack);
 		
 		
 		installedAddonsGUI = Bukkit.createInventory(null, (int) Math.ceil(Dimensions.getAddonManager().getAddons().size()/9f)*9, "§cDimensions addons manager");
@@ -122,9 +114,6 @@ public class AddonCommand extends DimensionsCommand implements Listener {
 				e.setCancelled(true);
 			} else if (e.getCurrentItem().isSimilar(installAddonsItemStack)) {
 				e.getWhoClicked().sendMessage("§7This feature is not ready yet. It will be added in the future.");
-				e.setCancelled(true);
-			} else if (e.getCurrentItem().isSimilar(reloadAddonsItemStack)) {
-				Dimensions.getAddonManager().reloadAddon(null);
 				e.setCancelled(true);
 			} else if (e.getClickedInventory().equals(installedAddonsGUI)) {
 				DimensionsAddon addon = Dimensions.getAddonManager().getAddonByName(e.getCurrentItem().getItemMeta().getDisplayName().replaceFirst("§a", ""));

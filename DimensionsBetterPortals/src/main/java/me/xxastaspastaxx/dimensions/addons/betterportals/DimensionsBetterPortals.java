@@ -18,13 +18,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 import com.lauriethefish.betterportals.api.BetterPortal;
 import com.lauriethefish.betterportals.api.BetterPortalsAPI;
 import com.lauriethefish.betterportals.api.PortalDirection;
 import com.lauriethefish.betterportals.api.PortalPosition;
-import com.lauriethefish.betterportals.api.PortalPredicate;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
@@ -65,31 +63,6 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 		Dimensions.getCommandManager().registerCommand("Portal commands", new MirrorPortalCommand("mirror", "", new String[0], "Make the portal look the other way", "", true, this));
 		try {
             this.bpAPI = BetterPortalsAPI.get();
-    	    /*bpAPI.addPortalTeleportPredicate(new PortalPredicate() {
-			
-    			@Override
-    			public boolean test(@NotNull BetterPortal portal, @NotNull Player player) {
-    				return portal.getName()==null || !portal.getName().startsWith("dimensions");
-    			}
-    		});*/
-            
-            bpAPI.addPortalTeleportPredicate(new PortalPredicate() {
-    			
-    			@Override
-    			public boolean test(@NotNull BetterPortal portal, @NotNull Player player) {
-    				if (portal.getName()==null || !portal.getName().startsWith("dimensions-")) {
-    					CompletePortal compl = Dimensions.getCompletePortalManager().getCompletePortal(portal.getOriginPos().getLocation(), false, false);
-    					if (compl!=null) {
-    						//compl.handleEntity(player);
-    						//used.add(compl);
-    						//Dimensions.getAddonManager().getBaseAddon().usePortalParent(compl, player);
-    						//used.remove(compl);
-    					}
-    				}
-    				return true;
-    			}
-    		});
-            
 		}   catch(IllegalStateException ex) {
 			ex.printStackTrace();
         }
@@ -134,6 +107,8 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 			link(complete, linked, false);
 			return;
 		}
+		
+		if (e.getCause()==CustomPortalIgniteCause.LOAD_PORTAL) return;
 		
 		Entity entity = e.getEntity();
 		
@@ -211,15 +186,16 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 		    	destinationPos.getDirection().swapVector(size), UUID.randomUUID(), "dimensions"
 		    );
 	    
+
 		@SuppressWarnings("unchecked")
 		HashMap<CompletePortal, UUID> map = (HashMap<CompletePortal, UUID>) getOption(completePortal.getCustomPortal(), "betterPortal");
-	    
+
 	    if (map.containsKey(completePortal)) {
 			BetterPortal bt = bpAPI.getPortalById(map.get(completePortal));
-			completePortal.getLinkedPortal().setTag("betterPortal", null);
-			completePortal.getLinkedPortal().setTag("hidePortalInside", null);
-			completePortal.getLinkedPortal().setTag("hidePortalParticles", null);
-			completePortal.getLinkedPortal().setTag("mirrored", null);
+			completePortal.setTag("betterPortal", null);
+			completePortal.setTag("hidePortalInside", null);
+			completePortal.setTag("hidePortalParticles", null);
+			completePortal.setTag("mirrored", null);
 			
 			if (bt!=null) 
 				bt.remove(false);
@@ -227,10 +203,10 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 	    
 	    if (map.containsKey(linked)) {
 			BetterPortal bt = bpAPI.getPortalById(map.get(linked));
-			linked.getLinkedPortal().setTag("betterPortal", null);
-			linked.getLinkedPortal().setTag("hidePortalInside", null);
-			linked.getLinkedPortal().setTag("hidePortalParticles", null);
-			linked.getLinkedPortal().setTag("mirrored", null);
+			linked.setTag("betterPortal", null);
+			linked.setTag("hidePortalInside", null);
+			linked.setTag("hidePortalParticles", null);
+			linked.setTag("mirrored", null);
 			
 			if (bt!=null) 
 				bt.remove(false);

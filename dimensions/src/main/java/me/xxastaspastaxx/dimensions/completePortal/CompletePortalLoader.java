@@ -57,19 +57,20 @@ public class CompletePortalLoader {
 				PortalGeometry geom = PortalGeometry.getPortalGeometry().getPortal(customPortal, loc);
 				if (geom==null) continue;
 				
-				CompletePortal completePortal = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, world, geom), null, CustomPortalIgniteCause.LOAD_PORTAL, null);
-				
-				completePortal.setTags(gson.fromJson((String) portal.get("portalTags"), new TypeToken<HashMap<String, Object>>() { }.getType()));
+				CompletePortal linked = null;
 				
 				if (portal.containsKey("linkedPortalWorld")) {
 					World linkedWorld = Bukkit.getWorld((String) portal.get("linkedPortalWorld"));
 					Location linkedLoc = new Location(linkedWorld, (double) portal.get("linkedPortalCenterX"), (double) portal.get("linkedPortalCenterY"), (double) portal.get("linkedPortalCenterZ"));
-					CompletePortal linkedPortal = Dimensions.getCompletePortalManager().getCompletePortal(linkedLoc, false, false);
-					if (linkedPortal!=null) {
-						completePortal.setLinkedPortal(linkedPortal);
-						linkedPortal.setLinkedPortal(completePortal);
-					}
+					linked = Dimensions.getCompletePortalManager().getCompletePortal(linkedLoc, false, false);
+					
 				}
+				
+				CompletePortal completePortal = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, world, geom, linked), null, CustomPortalIgniteCause.LOAD_PORTAL, null);
+				
+				completePortal.setTags(gson.fromJson((String) portal.get("portalTags"), new TypeToken<HashMap<String, Object>>() { }.getType()));
+				
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

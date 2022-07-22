@@ -91,6 +91,7 @@ public class CustomPortalGeometry extends PortalGeometry {
 	public void buildPortal(Location newLocation, World destinationWorld, CustomPortal customPortal) {
 		
 		frameManager.setPortal(newLocation, destinationWorld, getMin(), getMax(), iszAxis());
+
 		
 	}
 	
