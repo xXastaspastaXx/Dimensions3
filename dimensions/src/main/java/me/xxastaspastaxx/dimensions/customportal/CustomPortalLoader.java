@@ -102,13 +102,10 @@ public class CustomPortalLoader {
 				Bukkit.getServer().createWorld(new WorldCreator(worldName));
 			}*/
 			
-			String[] ratioString = portalConfig.getString("World.Ratio", "1:1").split(":");
-			int ratio0 = Integer.parseInt(ratioString[0]);
-			int ratio1 = Integer.parseInt(ratioString[1]);
-			int ratio = ratio1/ratio0;
-
-			boolean buildExitPortal = portalConfig.getBoolean("Options.BuildExitPortal", true);
-			boolean spawnOnAir = portalConfig.getBoolean("Options.SpawnOnAir", false);
+//			String[] ratioString = portalConfig.getString("World.Ratio", "1:1").split(":");
+//			int ratio0 = Integer.parseInt(ratioString[0]);
+//			int ratio1 = Integer.parseInt(ratioString[1]);
+//			int ratio = ratio1/ratio0;
 			
 			List<String> disabledWorlds = portalConfig.getStringList("Options.DisabledWorlds");
 			
@@ -131,7 +128,7 @@ public class CustomPortalLoader {
 			}
 			
 			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
-					worldName, ratio, buildExitPortal, spawnOnAir, disabledWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
+					worldName, disabledWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
 			portal.setInsideBlockData(insideMaterial.createBlockData());
 			for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
 				addon.registerPortal(portalConfig, portal);

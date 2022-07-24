@@ -43,11 +43,8 @@ public class CustomPortal {
 	
 	private String worldName;
 
-	private float worldRatio;
-	private float worldRatioReturn;
-	
-	private boolean buildExitPortal;
-	private boolean spawnOnAir;
+//	private float worldRatio;
+//	private float worldRatioReturn;
 	
 	private List<String> disabledWorldsList;
 	
@@ -60,7 +57,7 @@ public class CustomPortal {
 	HashMap<EntityType, Integer> entitySpawnList;
 	public CustomPortal(String portalId, String displayName, boolean enabled, Material outsideMaterial, AxisOrFace outsideBlockDir,
 			Material insideMaterial, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
-			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, float worldRatio, boolean buildExitPortal, boolean spawnOnAir,
+			int maximumHeight, int maximumWidth, int minimumWidth, String worldName,
 			List<String> disabledWorldsList, int teleportDelay, boolean enableParticles, HashMap<EntityType, EntityType> entityTransformationList,
 			int spawnDelayMin, int spawnDelayMax, HashMap<EntityType, Integer> entitySpawnList) {
 		this.portalId = portalId;
@@ -77,10 +74,8 @@ public class CustomPortal {
 		this.maximumWidth = maximumWidth;
 		this.minimumWidth = minimumWidth;
 		this.worldName = worldName;
-		this.worldRatio = worldRatio;
-		this.worldRatioReturn = 1/worldRatio;
-		this.buildExitPortal = buildExitPortal;
-		this.spawnOnAir = spawnOnAir;
+//		this.worldRatio = worldRatio;
+//		this.worldRatioReturn = 1/worldRatio;
 		this.disabledWorldsList = disabledWorldsList;
 		this.teleportDelay = teleportDelay;
 		this.enableParticles = enableParticles;
@@ -141,18 +136,6 @@ public class CustomPortal {
 	}
 	public World getWorld() {
 		return Bukkit.getWorld(worldName);
-	}
-	public float getWorldRatio() {
-		return worldRatio;
-	}
-	public float getWorldRatioReturn() {
-		return worldRatioReturn;
-	}
-	public boolean isBuildExitPortal() {
-		return buildExitPortal;
-	}
-	public boolean isSpawnOnAir() {
-		return spawnOnAir;
 	}
 	public List<String> getDisabledWorldsList() {
 		return disabledWorldsList;

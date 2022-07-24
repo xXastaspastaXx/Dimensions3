@@ -83,10 +83,10 @@ public class CompletePortalManager {
 		return (ArrayList<CompletePortal>) completePortals.stream().filter(complete -> complete.getWorld().equals(loc.getWorld()) && complete.getCustomPortal().equals(customPortal) && complete.getCenter().distanceSquared(loc)<=searchRadiusSquared).collect(Collectors.toList());
 	}
 	
-	public CompletePortal getNearestPortal(Location teleportLocation, CustomPortal customPortal) {
+	public CompletePortal getNearestPortal(Location teleportLocation, CustomPortal customPortal, double ratio) {
 		
 		int searchRadius = (int) Math.pow(DimensionsSettings.searchRadius, 2);
-		double closestDistance = (searchRadius/2+1)+searchRadius*customPortal.getWorldRatio()*0.5;
+		double closestDistance = (searchRadius/2+1)+searchRadius*ratio*0.5;
 		CompletePortal closestPortal = null;
 		for(CompletePortal complete : completePortals) {
 			if (!complete.getCustomPortal().equals(customPortal) || !complete.getWorld().equals(teleportLocation.getWorld())) continue;
@@ -100,10 +100,10 @@ public class CompletePortalManager {
 		return closestPortal;
 	}
 	
-	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, boolean sameAxis, boolean sameSize) {
+	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, double ratio, boolean sameAxis, boolean sameSize) {
 		
 		int searchRadius = (int) Math.pow(DimensionsSettings.searchRadius, 2);
-		double closestDistance = (searchRadius/2+1)+searchRadius*sample.getCustomPortal().getWorldRatio()*0.5;
+		double closestDistance = (searchRadius/2+1)+searchRadius*ratio*0.5;
 		CompletePortal closestPortal = null;
 		for(CompletePortal complete : completePortals) {
 			if (!complete.getCustomPortal().equals(sample.getCustomPortal()) || !complete.getCenter().getWorld().equals(teleportLocation.getWorld())) continue;

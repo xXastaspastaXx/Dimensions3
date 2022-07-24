@@ -155,23 +155,26 @@ public class CompletePortal {
 		if (linkedPortal!=null) return linkedPortal;
 		
 		Location newLocation = overrideLocation==null?getCenter():overrideLocation;
+
 		
 		World destinationWorld = customPortal.getWorld();
-		if (!world.equals(destinationWorld)) {
-			newLocation = newLocation.multiply(customPortal.getWorldRatioReturn());
-		} else {
+		if (world.equals(destinationWorld))
 			destinationWorld = lastLinkedWorld==null?DimensionsSettings.fallbackWorld:lastLinkedWorld;
-			newLocation = newLocation.multiply(customPortal.getWorldRatio());
-		}
 		newLocation.setWorld(destinationWorld);
+		
+		//Fix world ratio
+		double currWorldSize = Math.pow(world.getWorldBorder().getSize(),2);
+		double worldSize = Math.pow(destinationWorld.getWorldBorder().getSize(),2);
+		double ratio = worldSize/currWorldSize;
+		newLocation = newLocation.multiply(ratio);
 		
 		//FIX the wolrd height ratio
 		int currMinWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MinHeight", 0);
-		int currMaxWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MaxHeight", 255);
+		int currMaxWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MaxHeight", world.getMaxHeight());
 		int currWorldHeight = currMaxWorldHeight-currMinWorldHeight;
 		
 		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", 0);
-		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", 255);
+		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
 		int worldHeight = maxWorldHeight-minWorldHeight;
 
 		double currPercent = (getCenter().getY()-currMinWorldHeight)/currWorldHeight;
@@ -179,7 +182,7 @@ public class CompletePortal {
 		newLocation.setY(worldHeight*currPercent+minWorldHeight);
 		//===============
 		
-		CompletePortal destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, true, true);
+		CompletePortal destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, ratio, true, true);
 		
 		if (destination==null) {
 			if (!buildNewPortal) return null;
@@ -211,9 +214,9 @@ public class CompletePortal {
 		Location backupLocation = null;
 		Location backupLocation2 = null;
 		Location checkLocation;
-		
-		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", 0);
-		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", 255);
+	
+//		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", 0);
+//		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
 		
 		for (int m =0;m<DimensionsSettings.safeSpotSearchRadius;m++) {
 			checkLocation = newLocation.clone();
@@ -244,12 +247,12 @@ public class CompletePortal {
 					checkLocation.setZ(newLocation.getZ()+z);
 					checkLocation.setX(newLocation.getX()+x);
 					
-					if (checkLocation.getY()>minWorldHeight && checkLocation.getY()+height<maxWorldHeight) {
+//					if (checkLocation.getY()>minWorldHeight && checkLocation.getY()+height<maxWorldHeight) {
 						//TODO check location
 						if (canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, true)) return checkLocation;
 						if (backupLocation==null && canBuildPortal(checkLocation, !zAxis, destinationWorld, height, width, true)) backupLocation = checkLocation.clone();
 						if (backupLocation2==null && canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, false)) backupLocation2 = checkLocation.clone();
-					}
+//					}
 					
 					switch (dir) {
 						case 0:
