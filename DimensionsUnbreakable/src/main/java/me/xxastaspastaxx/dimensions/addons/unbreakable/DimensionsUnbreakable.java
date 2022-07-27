@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -51,9 +52,9 @@ public class DimensionsUnbreakable extends DimensionsAddon implements Listener {
 	@Override
 	public void registerPortal(YamlConfiguration portalConfig, CustomPortal portal) {
 
-		String[] spl = portalConfig.getString("Addon.Unbreakable", "false").split(", ");
+		List<String> spl = portalConfig.getStringList("Addon.Unbreakable");
 
-		if(spl[0].equalsIgnoreCase("false")) return;
+		if(spl.size()==0) return;
 
 		ArrayList<CustomPortalDestroyCause> list = new ArrayList<CustomPortalDestroyCause>();
 		for (String str : spl) {
