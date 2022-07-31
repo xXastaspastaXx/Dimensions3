@@ -163,17 +163,17 @@ public class CompletePortal {
 		newLocation.setWorld(destinationWorld);
 		
 		//Fix world ratio
-		double currWorldSize = Math.pow(world.getWorldBorder().getSize(),2);
-		double worldSize = Math.pow(destinationWorld.getWorldBorder().getSize(),2);
+		double currWorldSize = (double) DimensionsSettings.get("Worlds."+world.getName()+".Size", world.getWorldBorder().getSize());
+		double worldSize = (double) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".Size", destinationWorld.getWorldBorder().getSize());
 		double ratio = worldSize/currWorldSize;
 		newLocation = newLocation.multiply(ratio);
 		
 		//FIX the wolrd height ratio
-		int currMinWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MinHeight", 0);
+		int currMinWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MinHeight", -60);
 		int currMaxWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MaxHeight", world.getMaxHeight());
 		int currWorldHeight = currMaxWorldHeight-currMinWorldHeight;
 		
-		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", 0);
+		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", -60);
 		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
 		int worldHeight = maxWorldHeight-minWorldHeight;
 
@@ -247,12 +247,12 @@ public class CompletePortal {
 					checkLocation.setZ(newLocation.getZ()+z);
 					checkLocation.setX(newLocation.getX()+x);
 					
-//					if (checkLocation.getY()>minWorldHeight && checkLocation.getY()+height<maxWorldHeight) {
+					if (destinationWorld.getWorldBorder().isInside(checkLocation)) {
 						//TODO check location
 						if (canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, true)) return checkLocation;
 						if (backupLocation==null && canBuildPortal(checkLocation, !zAxis, destinationWorld, height, width, true)) backupLocation = checkLocation.clone();
 						if (backupLocation2==null && canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, false)) backupLocation2 = checkLocation.clone();
-//					}
+					}
 					
 					switch (dir) {
 						case 0:

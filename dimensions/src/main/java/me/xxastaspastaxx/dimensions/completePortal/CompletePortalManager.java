@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.NumberConversions;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
@@ -83,33 +84,17 @@ public class CompletePortalManager {
 		return (ArrayList<CompletePortal>) completePortals.stream().filter(complete -> complete.getWorld().equals(loc.getWorld()) && complete.getCustomPortal().equals(customPortal) && complete.getCenter().distanceSquared(loc)<=searchRadiusSquared).collect(Collectors.toList());
 	}
 	
-	public CompletePortal getNearestPortal(Location teleportLocation, CustomPortal customPortal, double ratio) {
-		
-		int searchRadius = (int) Math.pow(DimensionsSettings.searchRadius, 2);
-		double closestDistance = (searchRadius/2+1)+searchRadius*ratio*0.5;
-		CompletePortal closestPortal = null;
-		for(CompletePortal complete : completePortals) {
-			if (!complete.getCustomPortal().equals(customPortal) || !complete.getWorld().equals(teleportLocation.getWorld())) continue;
-			double dist = complete.getCenter().distanceSquared(teleportLocation);
-			if (closestDistance>dist) {
-	    		closestDistance = dist;
-	    		closestPortal = complete;
-	    	}
-		}
-		
-		return closestPortal;
-	}
-	
 	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, double ratio, boolean sameAxis, boolean sameSize) {
 		
-		int searchRadius = (int) Math.pow(DimensionsSettings.searchRadius, 2);
-		double closestDistance = (searchRadius/2+1)+searchRadius*ratio*0.5;
+		double closestDistance =  Math.pow(DimensionsSettings.searchRadius*ratio,2)*2;
 		CompletePortal closestPortal = null;
 		for(CompletePortal complete : completePortals) {
 			if (!complete.getCustomPortal().equals(sample.getCustomPortal()) || !complete.getCenter().getWorld().equals(teleportLocation.getWorld())) continue;
 			if (sameAxis && sample.getPortalGeometry().iszAxis()!=complete.getPortalGeometry().iszAxis()) continue;
 			if (sameSize && (sample.getPortalGeometry().getPortalWidth()!=complete.getPortalGeometry().getPortalWidth() || sample.getPortalGeometry().getPortalHeight()!=complete.getPortalGeometry().getPortalHeight())) continue;
-			double dist = complete.getCenter().distanceSquared(teleportLocation);
+			Location temp = complete.getCenter();
+			double dist = NumberConversions.square(temp.getX() - teleportLocation.getX()) + NumberConversions.square(temp.getZ() - teleportLocation.getZ());
+			
 			if (closestDistance>dist) {
 	    		closestDistance = dist;
 	    		closestPortal = complete;
