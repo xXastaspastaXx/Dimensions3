@@ -41,7 +41,7 @@ public class DimensionsPastedPortalsAddon extends DimensionsAddon implements Lis
 	private boolean onWorldGeneration = false;
 	
 	public DimensionsPastedPortalsAddon() {
-		super("DimensionsPastedPortalsAddon", "3.0.0", "Auto ignite pasted portals", DimensionsAddonPriority.NORMAL);
+		super("DimensionsPastedPortalsAddon", "3.0.1", "Auto ignite pasted portals", DimensionsAddonPriority.NORMAL);
 	}
 	
 	
@@ -50,14 +50,14 @@ public class DimensionsPastedPortalsAddon extends DimensionsAddon implements Lis
 		this.pl = main;
 
 
-		if ((boolean) DimensionsSettings.get("PastedPortals.WorldEdit",false)) {
+		if (DimensionsSettings.getConfig().getBoolean("PastedPortals.WorldEdit",false)) {
 			Plugin worldEdit = Bukkit.getPluginManager().getPlugin("WorldEdit");
 		    if (worldEdit!=null && worldEdit instanceof WorldEditPlugin) {
 		    	new WorldEditPasting();
 		    }
 	   }
 
-	   if ((boolean) DimensionsSettings.get("PastedPortals.Skyblock",false)) {
+	   if (DimensionsSettings.getConfig().getBoolean("PastedPortals.Skyblock",false)) {
 		   Plugin bentoBox = Bukkit.getPluginManager().getPlugin("BentoBox");
 		   if (bentoBox!=null && bentoBox instanceof BentoBox) {
 			   new PastedBentoBox(this);
@@ -73,7 +73,7 @@ public class DimensionsPastedPortalsAddon extends DimensionsAddon implements Lis
 		   }
 	   }
 		
-	   onWorldGeneration = (boolean) DimensionsSettings.get("PastedPortals.OnWorldGeneration",false);
+	   onWorldGeneration = DimensionsSettings.getConfig().getBoolean("PastedPortals.OnWorldGeneration",false);
 	   
 		Bukkit.getServer().getPluginManager().registerEvents(this, pl);
 	}

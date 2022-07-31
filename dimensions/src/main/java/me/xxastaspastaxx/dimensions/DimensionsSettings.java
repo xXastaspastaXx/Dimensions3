@@ -4,14 +4,18 @@ import java.lang.reflect.Field;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class DimensionsSettings {
 	
-	private static final double configVersion = 0.6;
-	
+	private static final double configVersion = 0.7;
+
 	public static int searchRadius = 128;
+	
+	public static boolean searchSameAxis = false;
+	public static boolean searchSameSize = false;
+	public static boolean searchFirstClonePortal = true;
+	
 	public static int safeSpotSearchRadius = 16;
 	public static World fallbackWorld = null;
 	public static int debugLevel = 2;
@@ -72,28 +76,10 @@ public class DimensionsSettings {
 		config.addDefault("fallbackWorld", fallbackWorld.getName());
 		main.saveConfig();
 		fallbackWorld = Bukkit.getWorld(config.getString("fallbackWorld"));
-		if (!Bukkit.getServer().getWorlds().contains(fallbackWorld)) {
-			fallbackWorld = Bukkit.getServer().createWorld(new WorldCreator(config.getString("fallbackWorld")));
-		}
 	}
 
-	public static Object get(String key) {
-		if (config.get(key)==null) {
-			DimensionsDebbuger.debug("An option that was not defined in the config is required. Please open the config.yml.", DimensionsDebbuger.VERY_HIGH);
-			config.set(key, "PLEASE CHANGE");
-			main.saveConfig();
-		}
-		
-		return config.get(key);
-	}
-	
-	public static Object get(String key, Object def) {
-		if (config.get(key)==null) {
-			config.set(key, def);
-			main.saveConfig();
-		}
-		
-		return config.get(key);
+	public static FileConfiguration getConfig() {
+		return config;
 	}
 	
 	public void reload() {

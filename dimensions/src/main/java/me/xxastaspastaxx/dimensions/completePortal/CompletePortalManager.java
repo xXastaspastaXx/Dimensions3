@@ -86,7 +86,7 @@ public class CompletePortalManager {
 	
 	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, double ratio, boolean sameAxis, boolean sameSize) {
 		
-		double closestDistance =  Math.pow(DimensionsSettings.searchRadius*ratio,2)*2;
+		double closestDistance =  Math.pow(DimensionsSettings.searchRadius*ratio,2);
 		CompletePortal closestPortal = null;
 		for(CompletePortal complete : completePortals) {
 			if (!complete.getCustomPortal().equals(sample.getCustomPortal()) || !complete.getCenter().getWorld().equals(teleportLocation.getWorld())) continue;

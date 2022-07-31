@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -162,19 +163,21 @@ public class CompletePortal {
 			destinationWorld = lastLinkedWorld==null?DimensionsSettings.fallbackWorld:lastLinkedWorld;
 		newLocation.setWorld(destinationWorld);
 		
+		FileConfiguration conf = DimensionsSettings.getConfig();
+		
 		//Fix world ratio
-		double currWorldSize = (double) DimensionsSettings.get("Worlds."+world.getName()+".Size", world.getWorldBorder().getSize());
-		double worldSize = (double) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".Size", destinationWorld.getWorldBorder().getSize());
+		double currWorldSize = conf.getDouble("Worlds."+world.getName()+".Size", world.getWorldBorder().getSize());
+		double worldSize = conf.getDouble("Worlds."+destinationWorld.getName()+".Size", destinationWorld.getWorldBorder().getSize());
 		double ratio = worldSize/currWorldSize;
 		newLocation = newLocation.multiply(ratio);
 		
 		//FIX the wolrd height ratio
-		int currMinWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MinHeight", -60);
-		int currMaxWorldHeight = (int) DimensionsSettings.get("Worlds."+world.getName()+".MaxHeight", world.getMaxHeight());
+		int currMinWorldHeight = conf.getInt("Worlds."+world.getName()+".MinHeight", -60);
+		int currMaxWorldHeight = conf.getInt("Worlds."+world.getName()+".MaxHeight", world.getMaxHeight());
 		int currWorldHeight = currMaxWorldHeight-currMinWorldHeight;
 		
-		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", -60);
-		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
+		int minWorldHeight = conf.getInt("Worlds."+destinationWorld.getName()+".MinHeight", -60);
+		int maxWorldHeight = conf.getInt("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
 		int worldHeight = maxWorldHeight-minWorldHeight;
 
 		double currPercent = (getCenter().getY()-currMinWorldHeight)/currWorldHeight;
@@ -182,7 +185,12 @@ public class CompletePortal {
 		newLocation.setY(worldHeight*currPercent+minWorldHeight);
 		//===============
 		
-		CompletePortal destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, ratio, true, true);
+		CompletePortal destination = null;
+		if (DimensionsSettings.searchFirstClonePortal) 
+			destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, ratio, true, true);
+		
+		if (destination==null)
+			destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, ratio, DimensionsSettings.searchSameAxis, DimensionsSettings.searchSameSize);
 		
 		if (destination==null) {
 			if (!buildNewPortal) return null;

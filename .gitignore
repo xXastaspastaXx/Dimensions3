@@ -28,3 +28,9 @@ dimensions/.metadata/.lock
 *.gitignore
 *.jar
 *.class
+DimensionsPatreonCosmetics/src/main/java/me/xxastaspastaxx/dimensions/addons/patreoncosmetics/PatreonCommand.java
+DimensionsPatreonCosmetics/src/main/java/me/xxastaspastaxx/dimensions/addons/patreoncosmetics/PatreonDisableCommand.java
+DimensionsPatreonCosmetics/src/main/java/me/xxastaspastaxx/dimensions/addons/patreoncosmetics/DimensionsPatreonCosmetics.java
+DimensionsPatreonCosmetics/src/main/java/me/xxastaspastaxx/dimensions/addons/patreoncosmetics/cosmetics/CosmeticEffectManager.java
+DimensionsPatreonCosmetics/src/main/java/me/xxastaspastaxx/dimensions/addons/patreoncosmetics/cosmetics/CosmeticEffect.java
+DimensionsPatreonCosmetics/about.md
