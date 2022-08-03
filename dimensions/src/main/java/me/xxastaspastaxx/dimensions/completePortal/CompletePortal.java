@@ -124,14 +124,14 @@ public class CompletePortal {
 			
 			@Override
 			public void run() {
-				CustomPortalUseEvent useEvent = new CustomPortalUseEvent(CompletePortal.this, en, getDestinationPortal(false, null));
+				CustomPortalUseEvent useEvent = new CustomPortalUseEvent(CompletePortal.this, en, getDestinationPortal(false, null, null));
 				Bukkit.getPluginManager().callEvent(useEvent);
 				
 				if (useEvent.isCancelled()) return; 
 				CompletePortal destination = useEvent.getDestinationPortal();
 				
 				//If no portal was put as a destination from other sources, we create our own
-				if (destination==null) destination = getDestinationPortal(true, null);
+				if (destination==null) destination = getDestinationPortal(true, null, null);
 				
 				Location teleportLocation = destination.getCenter().clone();
 				teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
@@ -151,16 +151,19 @@ public class CompletePortal {
 	}
 	
 	
-	public CompletePortal getDestinationPortal(boolean buildNewPortal, Location overrideLocation) {
+	public CompletePortal getDestinationPortal(boolean buildNewPortal, Location overrideLocation, World overrideWorld) {
 
 		if (linkedPortal!=null) return linkedPortal;
 		
 		Location newLocation = overrideLocation==null?getCenter():overrideLocation;
 
 		
-		World destinationWorld = customPortal.getWorld();
-		if (world.equals(destinationWorld))
-			destinationWorld = lastLinkedWorld==null?DimensionsSettings.fallbackWorld:lastLinkedWorld;
+		World destinationWorld = overrideWorld;
+		if (destinationWorld==null) {
+			destinationWorld = customPortal.getWorld();
+			if (world.equals(destinationWorld))
+				destinationWorld = lastLinkedWorld==null?DimensionsSettings.fallbackWorld:lastLinkedWorld;
+		}
 		newLocation.setWorld(destinationWorld);
 		
 		FileConfiguration conf = DimensionsSettings.getConfig();

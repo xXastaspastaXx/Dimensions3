@@ -26,7 +26,7 @@ public class DimensionsRandomLocation extends DimensionsAddon implements Listene
 	//private Plugin pl;
 	
 	public DimensionsRandomLocation() {
-		super("DimensionsRandomLocationAddon", "3.0.0", "Teleport players to a random location", DimensionsAddonPriority.NORMAL);
+		super("DimensionsRandomLocationAddon", "3.0.1", "Teleport players to a random location", DimensionsAddonPriority.NORMAL);
 	}
 	
 	@Override
@@ -52,7 +52,7 @@ public class DimensionsRandomLocation extends DimensionsAddon implements Listene
 			
 		Location teleportLocation = new Location(null, loc.getX()+DimensionsUtils.getRandom(-range, range), loc.getY(), loc.getZ()+DimensionsUtils.getRandom(-range, range));
 
-		e.setDestinationPortal(complete.getDestinationPortal(true, teleportLocation));
+		e.setDestinationPortal(complete.getDestinationPortal(true, teleportLocation, null));
 	}
 
 	@Override

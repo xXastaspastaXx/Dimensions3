@@ -48,7 +48,7 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
     //ArrayList<CompletePortal> used = new ArrayList<CompletePortal>();
 	
 	public DimensionsBetterPortals() {
-		super("DimensionsBetterPortalsAddon", "3.0.0", "Hook for the better portals plugin", DimensionsAddonPriority.NORMAL);
+		super("DimensionsBetterPortalsAddon", "3.0.1", "Hook for the better portals plugin", DimensionsAddonPriority.NORMAL);
 	}
 	
 	@Override
@@ -119,7 +119,7 @@ public class DimensionsBetterPortals extends DimensionsAddon implements Listener
 				if (entity!=null && entity instanceof Player) 
 					((Player) entity).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("Creating exit portal...."));
 
-				CompletePortal tpPortal = complete.getDestinationPortal(true, null);
+				CompletePortal tpPortal = complete.getDestinationPortal(true, null, null);
 				
 				if (tpPortal==null) return;
 				
