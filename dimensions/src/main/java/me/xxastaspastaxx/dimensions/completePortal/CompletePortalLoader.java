@@ -32,7 +32,7 @@ public class CompletePortalLoader {
 	
 	
 	public CompletePortalLoader() {
-		gson = new GsonBuilder().create();
+		gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		File f = new File(FILE_PATH);
 		if (!f.exists()) {
@@ -54,7 +54,7 @@ public class CompletePortalLoader {
 				CustomPortal customPortal = Dimensions.getCustomPortalManager().getCustomPortal((String) portal.get("customPortal"));
 				World world = Bukkit.getWorld((String) portal.get("world"));
 				Location loc = new Location(world, (double) portal.get("centerX"), (double) portal.get("centerY"), (double) portal.get("centerZ"));
-				PortalGeometry geom = PortalGeometry.getPortalGeometry().getPortal(customPortal, loc);
+				PortalGeometry geom = PortalGeometry.getPortalGeometry(customPortal).getPortal(customPortal, loc);
 				if (geom==null) continue;
 				
 				CompletePortal linked = null;

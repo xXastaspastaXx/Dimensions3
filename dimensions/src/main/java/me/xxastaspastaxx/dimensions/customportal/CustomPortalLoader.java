@@ -60,7 +60,7 @@ public class CustomPortalLoader {
 		File portalFolder = new File(DIRECTORY_PATH);
 		if (!portalFolder.exists()) portalFolder.mkdir();
 		
-		PortalGeometry.instance = new PortalGeometry(null, null, null, null, false, null);
+		PortalGeometry.instance = PortalGeometry.nullGeometry();
 		
 		for (File f : PORTALS_DIRECTORY.listFiles()) {
 			String portalID = f.getName().replace(".yml", "");
@@ -141,7 +141,7 @@ public class CustomPortalLoader {
 
 	public static int[] createCombinedID(BlockData[] insideBlockData, Material insideMaterial) {
 		int combinedId[] = new int[2];
-		if (insideMaterial.isSolid() || insideMaterial==Material.NETHER_PORTAL) {
+		if (insideMaterial.isSolid() || insideMaterial==Material.NETHER_PORTAL || insideMaterial==Material.END_GATEWAY) {
 			try {
 				Object nmsBlockData = getStateMethod.invoke(insideBlockData[0]);
 				combinedId[0] = (int) getCombinedIdMethod.invoke(blockClass,nmsBlockData);

@@ -1,11 +1,5 @@
 package me.xxastaspastaxx.dimensions.addons.worldguardflags;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -103,22 +97,5 @@ public class DimensionsWorldGuardFlags extends DimensionsAddon implements Listen
 		return;
 	}*/
 	
-	@Override
-	public boolean needsUpdate() throws MalformedURLException, IOException {
-		String id = "1v2HQxiU8yCYXB4ze65gpEUSt7gJwgO4NenmDUqKM7ic";
-		
-        URL url = new URL("https://docs.google.com/feeds/download/documents/export/Export?id="+id+"&exportFormat=txt");
-        
-        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-		
-		return !getVersion().equals(in.readLine().replace(String.valueOf((char) 65279),""));
-	}
-
-	@Override
-	public String getUpdateJarURL() {
-		String id = "1x8qI2PfQEqBKGUHpvuoRM3vkyjHCphWq";
-		
-		return "https://drive.google.com/uc?id="+id+"&export=download";
-	}
 	
 }

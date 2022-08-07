@@ -2,6 +2,7 @@ package me.xxastaspastaxx.dimensions.completePortal;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -85,10 +86,16 @@ public class PortalEntitySand extends PortalEntity {
 	
 	public void destroy(Player p) {
 		destroyPacket.sendPacket(p);
+		
+		p.sendBlockChange(getLocation(),getLocation().getBlock().getBlockData());
 	}
 
 	public void destroyBroadcast() {
 		destroyPacket.broadcastPacket();
+		
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			p.sendBlockChange(getLocation(),getLocation().getBlock().getBlockData());
+		}
 	}
 	
 }

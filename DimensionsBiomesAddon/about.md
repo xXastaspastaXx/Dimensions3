@@ -1,1 +1,0 @@
-DimensionsBiomesAddon - Premium addon

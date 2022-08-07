@@ -1,27 +1,18 @@
 package me.xxastaspastaxx.dimensions.addons;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.ServiceLoader;
 
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
 
-import com.github.mrivanplays.jarloader.api.JarLoader;
-
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
-import me.xxastaspastaxx.dimensions.DimensionsSettings;
 
 public class DimensionsAddonManager {
 
@@ -29,85 +20,50 @@ public class DimensionsAddonManager {
 	
 	private Dimensions pl;
 
-	private ArrayList<DimensionsAddon> loadedAddons = new ArrayList<DimensionsAddon>();
-	private HashMap<DimensionsAddon, File> jarFiles = new HashMap<DimensionsAddon, File>();
+	private ServiceLoader<DimensionsAddon> loader;
 	
-	private JarLoader loader;
+	private ArrayList<DimensionsAddon> loadedAddons = new ArrayList<DimensionsAddon>();
+	
+	
+	private URL[] urls;
 	
 	public DimensionsAddonManager(Dimensions pl) {
 		this.pl = pl;
 		
-		loader = new JarLoader();
 		
-		loadedAddons.addAll(loadAll(new File(ADDONS_PATH), false));
+		File dir = new File(ADDONS_PATH);
+	    if(!dir.exists()) dir.mkdirs();
+	    
+	    ArrayList<URL> urls = new ArrayList<URL>();
+	    for(File file : dir.listFiles((file, name) -> name.endsWith(".jar"))) {
+	    	try {
+				urls.add(file.toURI().toURL());
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+	    	
+	    }
+	    this.urls = urls.toArray(new URL[0]);
+		loader = ServiceLoader.load(DimensionsAddon.class, URLClassLoader.newInstance(this.urls, Dimensions.class.getClassLoader()));
 		
-		ArrayList<DimensionsAddon> res = new ArrayList<DimensionsAddon>();
-		for (DimensionsAddonPriority priority : DimensionsAddonPriority.values()) {
-			for (DimensionsAddon addon : loadedAddons) {
-				if (addon.getAddonPriority()==priority) res.add(addon);
+		for (DimensionsAddon addon : loader) {
+			if (addon.onLoad(pl)) {
+				DimensionsDebbuger.MEDIUM.print("Loaded addon: "+addon.getName()+" v"+addon.getVersion());
+				loadedAddons.add(addon);
+			} else {
+				DimensionsDebbuger.MEDIUM.print("Failed to load addon: "+addon.getName()+" v"+addon.getVersion());
 			}
 		}
-		
-		loadedAddons = res;
 	}
 	
 	public void enableAddons() {
 		for (DimensionsAddon addon : loadedAddons) {
-			DimensionsDebbuger.debug("Enabling addon: "+addon.getName()+" v"+addon.getVersion(), DimensionsDebbuger.MEDIUM);
+			DimensionsDebbuger.MEDIUM.print("Enabling addon: "+addon.getName()+" v"+addon.getVersion());
 			addon.onEnable(pl);
 		}
 	}
-	
-	public List<DimensionsAddon> loadAll(File dir, boolean isReload) {
-	    if(!dir.exists()) {
-	    	dir.mkdirs();
-	    }
-	    if(!dir.isDirectory()) {
-		      return Collections.emptyList();
-		    }
-	    List<DimensionsAddon> loaded = new ArrayList<>();
-	    for(File file : dir.listFiles((file, name) -> name.endsWith(".jar"))) {
-	    	try {
-		    	DimensionsAddon addon = loader.load(file, DimensionsAddon.class);
-				DimensionsDebbuger.debug("Loading addon: "+addon.getName()+" v"+addon.getVersion(), DimensionsDebbuger.MEDIUM);
-				
-				boolean con = false;
-				for (DimensionsAddon addon2 : loaded) {
-					if (addon2.getName().contentEquals(addon.getName())) {
-						DimensionsDebbuger.debug("Addon already exists: "+addon.getName()+" v"+addon.getVersion(), DimensionsDebbuger.MEDIUM);
-						con = true;
-						break;
-					}
-				}
-				if (con) continue;
-				if (DimensionsSettings.checkForUpdatesOnStartup) {
-					if (addon.needsUpdate()) {
-						DimensionsDebbuger.debug("Found new version for "+addon.getName()+". Updating addon...", DimensionsDebbuger.MEDIUM);
-						try {
-							
-							addon = downloadAndExportAddon(file.getName(), addon.getUpdateJarURL());
-							DimensionsDebbuger.debug("Update complete for "+addon.getName()+".", DimensionsDebbuger.MEDIUM);
-						} catch (Exception e) {
 
-							DimensionsDebbuger.debug("Could not update", DimensionsDebbuger.MEDIUM);
-							continue;
-						}
-					}
-				}
-				
-				jarFiles.put(addon, file);
-		    	if (addon.onLoad(pl)) {
-			    	loaded.add(addon);
-			    } 
-	    	} catch (Exception | Error e) {
-				DimensionsDebbuger.debug("Could not load addon "+file.getName()+". More info bellow:", DimensionsDebbuger.HIGH);
-				e.printStackTrace();
-	    	}
-	    }
-	    return loaded;
-	  }
-
-	public DimensionsAddon downloadAndExportAddon(String jarName, String updateJarURL) {
+	/*public DimensionsAddon downloadAndExportAddon(String jarName, String updateJarURL) {
 	    try {
 	    	URLConnection urlConn = new URL(updateJarURL).openConnection();
 	    	urlConn.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
@@ -127,9 +83,10 @@ public class DimensionsAddonManager {
 			return null;
 		}
 	    
-		return loader.load(new File(ADDONS_PATH+jarName), DimensionsAddon.class);
+	    return null;
+		//return loader.load(new File(ADDONS_PATH+jarName), DimensionsAddon.class, urls);
 		
-	}
+	}*/
 
 	public DimensionsAddon getAddonByName(String addonName) {
 		for (DimensionsAddon addon : loadedAddons) {
@@ -174,7 +131,7 @@ public class DimensionsAddonManager {
 		return true;
     }
 
-	public boolean update(DimensionsAddon addon) {
+	/*public boolean update(DimensionsAddon addon) {
 		try {
 			if (!addon.needsUpdate()) return false;
 			DimensionsDebbuger.debug("Found new version for "+addon.getName()+". Updating addon...", DimensionsDebbuger.MEDIUM);
@@ -188,5 +145,5 @@ public class DimensionsAddonManager {
 		}
 		
 		return true;
-	}
+	}*/
 }

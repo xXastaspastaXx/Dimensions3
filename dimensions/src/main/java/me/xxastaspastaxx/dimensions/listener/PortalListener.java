@@ -57,6 +57,7 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
+import me.xxastaspastaxx.dimensions.completePortal.PortalEntitySolid;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 
@@ -82,8 +83,18 @@ public class PortalListener implements Listener {
 				}
 			}
 		};
-	
 		
+		if (DimensionsSettings.enableEntitiesTeleport) {
+			Bukkit.getScheduler().scheduleSyncRepeatingTask(pl, new Runnable() {
+				
+				@Override
+				public void run() {
+					for (CompletePortal portal : Dimensions.getCompletePortalManager().getCompletePortals()) {
+						portal.updatePortal();
+					}
+				}
+			}, 0, DimensionsSettings.updateEveryTick);
+		}
 		/*packetListener2 = new PacketAdapter(pl, ListenerPriority.NORMAL, PacketType.Play.Server.UNLOAD_CHUNK) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
@@ -128,7 +139,11 @@ public class PortalListener implements Listener {
 			p.sendBlockChange(to, DimensionsUtils.getNetherPortalEffect(complTo.getPortalGeometry().iszAxis()));
 		}
 		if (complFrom!=null) {
-			p.sendBlockChange(from, from.getBlock().getBlockData());
+			if (complFrom.getPortalEntities().get(0) instanceof PortalEntitySolid) {
+				p.sendBlockChange(from, complFrom.getCustomPortal().getInsideBlockData(complFrom.getPortalGeometry().iszAxis()));
+			} else {
+				p.sendBlockChange(from, from.getBlock().getBlockData());
+			}
 		}
 		
 		if (complFrom!=null && complFrom.hasInHold(p)) {

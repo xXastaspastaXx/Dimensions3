@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Orientable;
 
@@ -55,5 +56,15 @@ public class DimensionsUtils {
 		}
 		return false;
 	}
+	
+	 private static BlockFace[] radial = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
 
+	 public static BlockFace yawToFace(float yaw) {
+		 return radial[Math.round(yaw / 45f) & 0x7];
+	 }
+
+	public static boolean isBlockFacezAxis(BlockFace face) {
+		return face==BlockFace.WEST || face==BlockFace.EAST;
+	}
+	
 }

@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
@@ -29,19 +30,22 @@ public class PortalGeometry {
 	
 	private boolean zAxis;
 
+	private BoundingBox box;
+	
 	public static PortalGeometry instance;
 	
-	public PortalGeometry(Vector min, Vector max, Vector insideMin, Vector insideMax,
-			boolean zAxis, Vector center) {
+	protected PortalGeometry(Vector min, Vector max) {
 		if (min==null) return;
 		this.min = min;
 		this.max = max;
-		this.insideMin = insideMin;
-		this.insideMax = insideMax;
+		this.zAxis = min.getX()==max.getX();
+		this.center = min.getMidpoint(max).add(new Vector(0.5,0.5,0.5));
+		this.insideMin = min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0));
+		this.insideMax = max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0));
 		this.portalWidth = (byte) (!zAxis?max.getX()-min.getX():max.getZ()-min.getZ());
 		this.portalHeight = (byte) (max.getY()-min.getY());
-		this.center = center;
-		this.zAxis = zAxis;
+		
+		box = BoundingBox.of(insideMin, insideMax);
 	}
 
 	public Vector getMin() {
@@ -68,7 +72,6 @@ public class PortalGeometry {
 		return center;
 	}
 	
-	
 	public byte getPortalWidth() {
 		return portalWidth;
 	}
@@ -81,15 +84,19 @@ public class PortalGeometry {
 		customGeometry.put(portal, geom);
 	}
 	
-	public static PortalGeometry getPortalGeometry() {
-		return instance;
+	public static PortalGeometry getPortalGeometry(CustomPortal portal) {
+		if (customGeometry.containsKey(portal)) {
+			return customGeometry.get(portal);
+		 } else {
+			 return instance;
+		 }
+	}
+	
+	public PortalGeometry createGeometry(Vector min, Vector max) {
+		return new PortalGeometry(min, max);
 	}
 	
 	public PortalGeometry getPortal(CustomPortal customPortal, Location loc) {
-
-		 if (customGeometry.containsKey(customPortal)) {
-			return customGeometry.get(customPortal).getPortal(customPortal, loc);
-		 }
 		 
 		 loc = loc.getBlock().getLocation();
 			
@@ -151,7 +158,7 @@ public class PortalGeometry {
 		}
 		
 		
-		return new PortalGeometry(min, max, min.clone().subtract(new Vector(zAxis?0:-1,-1,zAxis?-1:0)), max.clone().subtract(new Vector(zAxis?0:1,1,zAxis?1:0)), zAxis, min.getMidpoint(max).add(new Vector(0.5,0.5,0.5)));		 
+		return new PortalGeometry(min, max);		 
 	}
 
 	public boolean isInside(Location location, boolean outside, boolean corner) {
@@ -207,5 +214,13 @@ public class PortalGeometry {
 			}
 		}
 		
+	}
+
+	public static PortalGeometry nullGeometry() {
+		return new PortalGeometry(null, null);
+	}
+
+	public BoundingBox getBoundingBox() {
+		return box;
 	}
 }

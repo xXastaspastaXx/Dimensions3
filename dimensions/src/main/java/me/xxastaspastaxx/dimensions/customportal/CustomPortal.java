@@ -165,7 +165,7 @@ public class CustomPortal {
 	public CompletePortal tryIgnite(Player player, ItemStack item, Location loc) {
 		if (item==null || item.getType()!=lighterMaterial) return null;
 		if (disabledWorldsList.contains(loc.getWorld().getName())) return null;
-		PortalGeometry temp = PortalGeometry.getPortalGeometry().getPortal(this, loc);
+		PortalGeometry temp = PortalGeometry.getPortalGeometry(this).getPortal(this, loc);
 		if (temp==null) return null;
 		
 		return Dimensions.getCompletePortalManager().createNew(new CompletePortal(this, loc.getWorld(), temp), player, CustomPortalIgniteCause.PLAYER, item);

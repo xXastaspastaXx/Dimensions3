@@ -1,12 +1,11 @@
 package me.xxastaspastaxx.dimensions.addons;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 
 public abstract class DimensionsAddon {
@@ -15,8 +14,9 @@ public abstract class DimensionsAddon {
 	private String addonVersion;
 	private String addonDescription;
 	private DimensionsAddonPriority addonPriority = DimensionsAddonPriority.NORMAL;
-	
-	private HashMap<CustomPortal, HashMap<String, Object>> addonOptions = new HashMap<CustomPortal, HashMap<String, Object>>();
+
+	private static HashMap<CompletePortal, HashMap<String, Object>> addonOptionsOverride = new HashMap<CompletePortal, HashMap<String, Object>>();
+	private static HashMap<CustomPortal, HashMap<String, Object>> addonOptions = new HashMap<CustomPortal, HashMap<String, Object>>();
 	
 	public DimensionsAddon(String addonName, String addonVersion, String addonDescription, DimensionsAddonPriority addonPriority) {
 		this.addonName = addonName;
@@ -41,7 +41,7 @@ public abstract class DimensionsAddon {
 		return addonPriority;
 	}
 	
-	public void setOption(CustomPortal portal, String key, Object value) {
+	public static void setOption(CustomPortal portal, String key, Object value) {
 		if (!addonOptions.containsKey(portal)) addonOptions.put(portal, new HashMap<String, Object>());
 		if (value==null)
 			addonOptions.get(portal).remove(key);
@@ -49,7 +49,29 @@ public abstract class DimensionsAddon {
 			addonOptions.get(portal).put(key, value);
 	}
 	
-	public Object getOption(CustomPortal portal, String key) {
+	public static void setOption(CompletePortal complete, String key, Object value) {
+		if (!addonOptionsOverride.containsKey(complete)) addonOptionsOverride.put(complete, new HashMap<String, Object>());
+		if (value==null)
+			addonOptionsOverride.get(complete).remove(key);
+		else
+			addonOptionsOverride.get(complete).put(key, value);
+	}
+	
+	public static Object getOption(CompletePortal complete, String key) {
+		if (addonOptionsOverride.containsKey(complete) && addonOptionsOverride.get(complete).containsKey(key)) {
+			Object obj = addonOptionsOverride.get(complete).get(key);
+			if (obj instanceof String && ((String) obj).equals("NULL")) return null;
+			return obj;
+		}
+		else {
+			CustomPortal portal = complete.getCustomPortal();
+			if (!addonOptions.containsKey(portal)) addonOptions.put(portal, new HashMap<String, Object>());
+			return addonOptions.get(portal).get(key);
+		}
+		
+	}
+	
+	public static Object getOption(CustomPortal portal, String key) {
 		if (!addonOptions.containsKey(portal)) addonOptions.put(portal, new HashMap<String, Object>());
 		return addonOptions.get(portal).get(key);
 	}
@@ -71,9 +93,6 @@ public abstract class DimensionsAddon {
 	public void registerPortal(YamlConfiguration portalConfig, CustomPortal portal) {
 	}
 
-	public abstract boolean needsUpdate() throws UnsupportedEncodingException, IOException;
-
-	public abstract String getUpdateJarURL();
 
 	public void resetOptions() {
 		addonOptions.clear();

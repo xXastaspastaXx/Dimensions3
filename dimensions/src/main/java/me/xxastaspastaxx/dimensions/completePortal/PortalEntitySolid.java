@@ -1,5 +1,6 @@
 package me.xxastaspastaxx.dimensions.completePortal;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -24,6 +25,7 @@ public class PortalEntitySolid extends PortalEntity {
 
 	public void destroyBroadcast() {
 		getLocation().getBlock().setType(Material.AIR);
+		Bukkit.getOnlinePlayers().forEach(p -> p.sendBlockChange(getLocation(), Material.AIR.createBlockData()));
 	}
 	
 }

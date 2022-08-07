@@ -38,7 +38,7 @@ public class Dimensions extends JavaPlugin {
 		
 		addonsManager.enableAddons();
 		
-		DimensionsDebbuger.debug("Loading portals", DimensionsDebbuger.DEBUG);
+		DimensionsDebbuger.DEBUG.print("Loading portals...");
 		customPortalManager = new CustomPortalManager(this);
 		completePortalManager = new CompletePortalManager(this);
 		

@@ -4,14 +4,21 @@ import java.util.logging.Level;
 
 public class DimensionsDebbuger {
 
-	public static final int DEBUG = 5;
-	public static final int VERY_LOW = 4;
-	public static final int LOW = 3;
-	public static final int MEDIUM = 2;
-	public static final int HIGH = 1;
-	public static final int VERY_HIGH = 0;
+	public static final DimensionsDebbuger DEBUG = new DimensionsDebbuger(5);
+	public static final DimensionsDebbuger VERY_LOW = new DimensionsDebbuger(4);
+	public static final DimensionsDebbuger LOW = new DimensionsDebbuger(3);
+	public static final DimensionsDebbuger MEDIUM = new DimensionsDebbuger(2);
+	public static final DimensionsDebbuger HIGH = new DimensionsDebbuger(1);
+	public static final DimensionsDebbuger VERY_HIGH = new DimensionsDebbuger(0);
 	
-	public static void debug(Object str, int level) {
+	
+	private int level = 0;
+	
+	public DimensionsDebbuger(int i) {
+		this.level = i;
+	}
+
+	public void print(Object str) {
 		if (DimensionsSettings.debugLevel>=level)
 			Dimensions.getInstance().getLogger().log(Level.INFO, str.toString());
 	}

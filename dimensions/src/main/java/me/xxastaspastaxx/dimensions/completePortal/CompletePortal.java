@@ -2,13 +2,16 @@ package me.xxastaspastaxx.dimensions.completePortal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -65,7 +68,7 @@ public class CompletePortal {
 		for (double y=min.getY();y<=max.getY();y++) {
 			for (double side=zAxis?min.getZ():min.getX();side<=(zAxis?max.getZ():max.getX());side++) {
 				PortalEntity entity;
-				if (customPortal.getInsideMaterial().isSolid() || customPortal.getInsideMaterial()==Material.NETHER_PORTAL) {
+				if (customPortal.getInsideMaterial().isSolid() || customPortal.getInsideMaterial()==Material.NETHER_PORTAL || customPortal.getInsideMaterial()==Material.END_GATEWAY) {
 					entity = new PortalEntitySand(new Location(world, zAxis?min.getX():side, y, !zAxis?min.getZ():side), customPortal.getCombinedID(zAxis));
 				} else {
 					entity = new PortalEntitySolid(new Location(world, zAxis?min.getX():side, y, !zAxis?min.getZ():side), customPortal.getInsideBlockData(zAxis));
@@ -114,6 +117,20 @@ public class CompletePortal {
 	}
 	
 	
+	public void updatePortal() {
+		if (!isActive()) return;
+		
+		for (Entity en : world.getNearbyEntities(portalGeometry.getBoundingBox(), new Predicate<Entity>() {
+			@Override
+			public boolean test(Entity t) {
+				return !(t instanceof Player);
+			}
+		})) {
+			handleEntity(en);
+		}
+		
+	}
+	
 	public void handleEntity(Entity en) {
 		if (hold.contains(en)) return;
 		
@@ -150,11 +167,7 @@ public class CompletePortal {
 		return loc.getWorld().equals(world) && portalGeometry.isInside(loc, outside, corner);
 	}
 	
-	
-	public CompletePortal getDestinationPortal(boolean buildNewPortal, Location overrideLocation, World overrideWorld) {
-
-		if (linkedPortal!=null) return linkedPortal;
-		
+	public Location getDetinationLocation(Location overrideLocation, World overrideWorld) {
 		Location newLocation = overrideLocation==null?getCenter():overrideLocation;
 
 		
@@ -169,10 +182,27 @@ public class CompletePortal {
 		FileConfiguration conf = DimensionsSettings.getConfig();
 		
 		//Fix world ratio
-		double currWorldSize = conf.getDouble("Worlds."+world.getName()+".Size", world.getWorldBorder().getSize());
-		double worldSize = conf.getDouble("Worlds."+destinationWorld.getName()+".Size", destinationWorld.getWorldBorder().getSize());
-		double ratio = worldSize/currWorldSize;
-		newLocation = newLocation.multiply(ratio);
+		newLocation = newLocation.multiply(getWorldRatio(destinationWorld));
+		WorldBorder border = destinationWorld.getWorldBorder();
+		if (!border.isInside(newLocation)) {
+
+			double borderX = border.getCenter().getX();
+			double borderZ = border.getCenter().getZ();
+			double borderSize = (border.getSize()/2)-(getPortalGeometry().getPortalWidth()*2);
+			
+			if (newLocation.getX()>borderX) {
+				newLocation.setX(Math.min(newLocation.getX(), borderX+borderSize));
+			} else {
+				newLocation.setX(Math.max(newLocation.getX(), borderX-borderSize));
+			}
+			
+			if (newLocation.getZ()>borderZ) {
+				newLocation.setZ(Math.min(newLocation.getZ(), borderZ+borderSize));
+			} else {
+				newLocation.setZ(Math.max(newLocation.getZ(), borderZ-borderSize));
+			}
+			
+		}
 		
 		//FIX the wolrd height ratio
 		int currMinWorldHeight = conf.getInt("Worlds."+world.getName()+".MinHeight", -60);
@@ -186,6 +216,17 @@ public class CompletePortal {
 		double currPercent = (getCenter().getY()-currMinWorldHeight)/currWorldHeight;
 		
 		newLocation.setY(worldHeight*currPercent+minWorldHeight);
+		
+		return newLocation;
+	}
+	
+	public CompletePortal getDestinationPortal(boolean buildNewPortal, Location overrideLocation, World overrideWorld) {
+
+		if (linkedPortal!=null) return linkedPortal;
+		
+		Location newLocation = getDetinationLocation(overrideLocation, overrideWorld);
+		World destinationWorld = newLocation.getWorld();
+		double ratio = getWorldRatio(destinationWorld);
 		//===============
 		
 		CompletePortal destination = null;
@@ -207,7 +248,7 @@ public class CompletePortal {
 			
 			portalGeometry.buildPortal(newLocation, destinationWorld, customPortal);
 			
-			PortalGeometry geom = PortalGeometry.getPortalGeometry().getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
+			PortalGeometry geom = PortalGeometry.getPortalGeometry(customPortal).getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
 			if (geom==null) return null;
 			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL, null);
 			if (destination==null) return null;
@@ -219,6 +260,17 @@ public class CompletePortal {
 		}
 		
 		return destination;
+	}
+	
+	public double getWorldRatio(World destinationWorld) {
+
+		FileConfiguration conf = DimensionsSettings.getConfig();
+		
+		double currWorldSize = conf.getDouble("Worlds."+world.getName()+".Size", world.getWorldBorder().getSize());
+		double worldSize = conf.getDouble("Worlds."+destinationWorld.getName()+".Size", destinationWorld.getWorldBorder().getSize());
+		double ratio = worldSize/currWorldSize;
+		
+		return ratio;
 	}
 
 	private Location getSafeLocation(Location newLocation, boolean zAxis, World destinationWorld, int height, int width) {
@@ -348,7 +400,14 @@ public class CompletePortal {
 		
 		for (PortalEntity en : spawnedEntities) {
 			en.destroy(p);
-			en.summon(p);
+			Bukkit.getScheduler().runTaskLater(Dimensions.getInstance(), new Runnable() {
+				
+				@Override
+				public void run() {
+					en.summon(p);
+					
+				}
+			}, 1);
 		}
 	}
 
@@ -358,7 +417,10 @@ public class CompletePortal {
 			Bukkit.getScheduler().cancelTask(particlesTask);
 		}
 		
+		world.playSound(getCenter(), customPortal.getBreakSound(), 1, 8);
+		
 		for (PortalEntity en : spawnedEntities) {
+			world.spawnParticle(Particle.BLOCK_CRACK, en.getLocation().clone().add(0.5,0.5,0.5), 10, customPortal.getInsideBlockData(false));
 			if (p==null)
 				en.destroyBroadcast();
 			else
@@ -404,5 +466,9 @@ public class CompletePortal {
 
 	public void setTags(HashMap<String, Object> tags) {
 		this.tags = tags;
+	}
+
+	public boolean isActive() {
+		return world.isChunkLoaded(chunkX, chunkZ);
 	}
 }
