@@ -148,7 +148,17 @@ public class CompletePortal {
 				CompletePortal destination = useEvent.getDestinationPortal();
 				
 				//If no portal was put as a destination from other sources, we create our own
-				if (destination==null) destination = getDestinationPortal(true, null, null);
+				if (destination==null) {
+					if (customPortal.canBuildExitPortal()) {
+						destination = getDestinationPortal(true, null, null);
+					} else {
+						Location destLoc = getDestinationLocation(null, null);
+						destination = new CompletePortal(customPortal, destLoc.getWorld(), portalGeometry.createGeometry(destLoc.toVector(), destLoc.toVector()));
+						
+						Block b = destination.getCenter().getBlock().getRelative(BlockFace.DOWN);
+						if (!b.getType().isSolid()) b.setType(customPortal.getOutsideMaterial());
+					}
+				}
 				
 				Location teleportLocation = destination.getCenter().clone();
 				teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
@@ -157,6 +167,7 @@ public class CompletePortal {
 				
 				en.teleport(teleportLocation);
 				removeFromHold(en);
+				
 			}
 		}, delay));
 		
@@ -167,7 +178,7 @@ public class CompletePortal {
 		return loc.getWorld().equals(world) && portalGeometry.isInside(loc, outside, corner);
 	}
 	
-	public Location getDetinationLocation(Location overrideLocation, World overrideWorld) {
+	public Location getDestinationLocation(Location overrideLocation, World overrideWorld) {
 		Location newLocation = overrideLocation==null?getCenter():overrideLocation;
 
 		
@@ -224,7 +235,7 @@ public class CompletePortal {
 
 		if (linkedPortal!=null) return linkedPortal;
 		
-		Location newLocation = getDetinationLocation(overrideLocation, overrideWorld);
+		Location newLocation = getDestinationLocation(overrideLocation, overrideWorld);
 		World destinationWorld = newLocation.getWorld();
 		double ratio = getWorldRatio(destinationWorld);
 		//===============
@@ -460,7 +471,7 @@ public class CompletePortal {
 		return tags.get(key);
 	}
 
-	protected HashMap<String, Object> getTags() {
+	public HashMap<String, Object> getTags() {
 		return tags;
 	}
 

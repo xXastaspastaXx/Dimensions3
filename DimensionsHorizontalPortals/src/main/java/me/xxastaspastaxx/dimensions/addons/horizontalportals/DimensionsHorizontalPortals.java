@@ -34,7 +34,7 @@ public class DimensionsHorizontalPortals extends DimensionsAddon implements List
 	//private Plugin pl;
 	
 	public DimensionsHorizontalPortals() {
-		super("DimensionsHorizontalPortalsAddon", "3.0.0", "Horizontal portals", DimensionsAddonPriority.LOW);
+		super("DimensionsHorizontalPortalsAddon", "3.0.1", "Horizontal portals", DimensionsAddonPriority.LOW);
 	}
 	
 	@Override
@@ -93,7 +93,7 @@ public class DimensionsHorizontalPortals extends DimensionsAddon implements List
 		byte width = portalGeometry.getPortalWidth();
 
 		//TODO find best location
-		Location newLocation = complete.getDetinationLocation(null, null);
+		Location newLocation = complete.getDestinationLocation(null, null);
 		World destinationWorld = newLocation.getWorld();
 		Location checkLocation = getSafeLocation(customPortal, newLocation, destinationWorld, width);
 		if (checkLocation!=null) newLocation = checkLocation;

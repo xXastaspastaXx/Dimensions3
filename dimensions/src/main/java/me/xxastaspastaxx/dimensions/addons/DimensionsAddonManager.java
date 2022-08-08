@@ -102,9 +102,9 @@ public class DimensionsAddonManager {
 	public void onDisable() {
 		for (DimensionsAddon addon : loadedAddons) {
 			addon.onDisable();
-			addon.resetOptions();
 		}
-		
+
+		DimensionsAddon.resetOptions();
 	}
 
 	public void unloadAll() {
@@ -113,13 +113,13 @@ public class DimensionsAddonManager {
 			unload(addon);
 		}
 		
+		DimensionsAddon.resetOptions();
 	}
 	
 	ArrayList<String> dontUnload = new ArrayList<String>(Arrays.asList(new String[] {"me.xxastaspastaxx.dimensions.listener.PortalListener", "me.xxastaspastaxx.dimensions.commands.AddonCommand"}));
 	
 	public boolean unload(DimensionsAddon plugin) {
 		plugin.onDisable();
-		plugin.resetOptions();
 		
 		for (RegisteredListener r : HandlerList.getRegisteredListeners(pl)) {
 			String s = r.getListener().getClass().getName();

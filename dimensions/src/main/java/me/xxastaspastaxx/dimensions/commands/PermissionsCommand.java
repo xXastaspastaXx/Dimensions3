@@ -8,7 +8,7 @@ import me.xxastaspastaxx.dimensions.DimensionsUtils;
 
 public class PermissionsCommand extends DimensionsCommand {
 
-	private int commandsPerPage = 5;
+	private float commandsPerPage = 5;
 	
 	public PermissionsCommand(String command, String args, String[] aliases, String description, String permission, boolean adminCommand) {
 		super(command,args,aliases,description, permission, adminCommand);
@@ -21,7 +21,7 @@ public class PermissionsCommand extends DimensionsCommand {
 		int page = 0;
 		if (args.length>1 && DimensionsUtils.isInt(args[1]) && !args[1].equals("0")) page = Integer.parseInt(args[1])-1;
 		ArrayList<DimensionsCommand> commandList = DimensionsCommandManager.getCommands();
-		for (int i =Math.max(page*commandsPerPage, 0);i<Math.min(page*commandsPerPage+(commandList.size()-commandsPerPage*page), commandsPerPage*(1+page));i++) {
+		for (int i =(int) Math.max(page*commandsPerPage, 0);i<Math.min(page*commandsPerPage+(commandList.size()-commandsPerPage*page), commandsPerPage*(1+page));i++) {
 			DimensionsCommand cmd = (DimensionsCommand) commandList.toArray()[i];
         	head += "\n/dim "+cmd.getCommand()+" "+cmd.getArgs()+" §c-§7 "+cmd.getPermission();
     	}

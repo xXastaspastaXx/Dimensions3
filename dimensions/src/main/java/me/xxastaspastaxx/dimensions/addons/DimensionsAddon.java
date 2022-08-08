@@ -94,7 +94,7 @@ public abstract class DimensionsAddon {
 	}
 
 
-	public void resetOptions() {
+	public static void resetOptions() {
 		addonOptions.clear();
 	}
 

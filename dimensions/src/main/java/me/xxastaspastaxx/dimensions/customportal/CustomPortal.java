@@ -46,7 +46,9 @@ public class CustomPortal {
 //	private float worldRatio;
 //	private float worldRatioReturn;
 	
-	private List<String> disabledWorldsList;
+	private boolean buildExitPortal;
+
+	private List<String> allowedWorldsList;
 	
 	private int teleportDelay;
 	private boolean enableParticles;
@@ -57,8 +59,8 @@ public class CustomPortal {
 	HashMap<EntityType, Integer> entitySpawnList;
 	public CustomPortal(String portalId, String displayName, boolean enabled, Material outsideMaterial, AxisOrFace outsideBlockDir,
 			Material insideMaterial, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
-			int maximumHeight, int maximumWidth, int minimumWidth, String worldName,
-			List<String> disabledWorldsList, int teleportDelay, boolean enableParticles, HashMap<EntityType, EntityType> entityTransformationList,
+			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, boolean buildExitPortal,
+			List<String> allowedWorldsList, int teleportDelay, boolean enableParticles, HashMap<EntityType, EntityType> entityTransformationList,
 			int spawnDelayMin, int spawnDelayMax, HashMap<EntityType, Integer> entitySpawnList) {
 		this.portalId = portalId;
 		this.displayName = displayName;
@@ -76,7 +78,16 @@ public class CustomPortal {
 		this.worldName = worldName;
 //		this.worldRatio = worldRatio;
 //		this.worldRatioReturn = 1/worldRatio;
-		this.disabledWorldsList = disabledWorldsList;
+		this.buildExitPortal = buildExitPortal;
+		
+		/*if (allowedWorldsList.contains("!")) {
+			for (String str : allowedWorldsList) {
+				if (str.startsWith("!")) disabledWorldsList.add(str.replace("!", ""));
+			}
+		}*/
+		this.allowedWorldsList = allowedWorldsList;
+		
+		
 		this.teleportDelay = teleportDelay;
 		this.enableParticles = enableParticles;
 		this.entityTransformationList = entityTransformationList;
@@ -137,8 +148,21 @@ public class CustomPortal {
 	public World getWorld() {
 		return Bukkit.getWorld(worldName);
 	}
-	public List<String> getDisabledWorldsList() {
-		return disabledWorldsList;
+	
+	public boolean canBuildExitPortal() {
+		return buildExitPortal;
+	}
+	
+	public List<String> getAllowWorldsList() {
+		return allowedWorldsList;
+	}
+	
+	public boolean isAllowedWorld(World world) {
+		String worldName = world.getName();
+		if (allowedWorldsList.contains("!"+worldName)) return false;
+		if (allowedWorldsList.contains("all") || allowedWorldsList.contains(worldName)) return true;
+		
+		return false;
 	}
 	
 	public int getTeleportDelay() {
@@ -164,7 +188,7 @@ public class CustomPortal {
 	
 	public CompletePortal tryIgnite(Player player, ItemStack item, Location loc) {
 		if (item==null || item.getType()!=lighterMaterial) return null;
-		if (disabledWorldsList.contains(loc.getWorld().getName())) return null;
+		if (!isAllowedWorld(loc.getWorld())) return null;
 		PortalGeometry temp = PortalGeometry.getPortalGeometry(this).getPortal(this, loc);
 		if (temp==null) return null;
 		

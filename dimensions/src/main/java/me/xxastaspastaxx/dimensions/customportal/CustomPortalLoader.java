@@ -107,9 +107,11 @@ public class CustomPortalLoader {
 //			int ratio1 = Integer.parseInt(ratioString[1]);
 //			int ratio = ratio1/ratio0;
 			
-			List<String> disabledWorlds = portalConfig.getStringList("Options.DisabledWorlds");
+			List<String> allowedWorlds = portalConfig.getStringList("Options.AllowedWorlds");
+			if (allowedWorlds.size()==0) allowedWorlds.add("all");
 			
 
+			boolean buildExitPortal = portalConfig.getBoolean("Options.BuildExitPortal", true);
 			int teleportDelay = portalConfig.getInt("Options.TeleportDelay", 4);
 			boolean enableParticles = portalConfig.getBoolean("Options.EnableParticles", true);
 			
@@ -126,9 +128,8 @@ public class CustomPortalLoader {
 				String[] spl = entity.toUpperCase().split(";");
 				entitySpawning.put(EntityType.valueOf(spl[0]), Integer.parseInt(spl[1]));
 			}
-			
 			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
-					worldName, disabledWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
+					worldName,buildExitPortal, allowedWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
 			portal.setInsideBlockData(insideMaterial.createBlockData());
 			for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
 				addon.registerPortal(portalConfig, portal);
