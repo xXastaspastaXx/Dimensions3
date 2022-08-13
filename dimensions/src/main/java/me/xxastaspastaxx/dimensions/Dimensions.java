@@ -15,6 +15,9 @@ import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalManager;
 import me.xxastaspastaxx.dimensions.listener.PortalListener;
 
+/**
+ * Main class of the plugin
+ */
 public class Dimensions extends JavaPlugin {
 	
 	private static Dimensions instance;
@@ -99,6 +102,8 @@ public class Dimensions extends JavaPlugin {
 	            }
 	            return map;
 	        }));
+	        
+	        metrics.addCustomChart(new Metrics.SingleLineChart("total_portal_uses", () -> DimensionsSettings.metricsSave));
 	}
 	
 	public void reload() {
@@ -106,7 +111,9 @@ public class Dimensions extends JavaPlugin {
 		completePortalManager.save();
 		
 		
-		
+
+		getConfig().set("metricsSave", DimensionsSettings.metricsSave);
+		saveConfig();
 		new DimensionsSettings(this);
 		DimensionsSettings.setDefaultWorld();
 
@@ -120,6 +127,9 @@ public class Dimensions extends JavaPlugin {
 	}
 	
 	public void onDisable() {
+
+		getConfig().set("metricsSave", DimensionsSettings.metricsSave);
+		saveConfig();
 		addonsManager.onDisable();
 		completePortalManager.save();
 	}

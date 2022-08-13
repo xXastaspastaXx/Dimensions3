@@ -8,45 +8,71 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Orientable;
-
+/**
+ * Contains methods that are commonly used
+ *
+ */
 public class DimensionsUtils {
 	
+	/** 
+	 * Check if the block is air
+	 * 
+	 * @param block block that is being checked
+	 * @return true if the type of the block is AIR or CAVE_AIR
+	 */
 	public static boolean isAir(Block block) {
 		return block.getType()==Material.AIR ||block.getType()==Material.CAVE_AIR;
 	}
 	
+	/**
+	 * Return a random integer in the given range
+	 * 
+	 * @param min inclusive
+	 * @param max inclusive
+	 * @return a random integer
+	 */
 	public static int getRandom(int min, int max) {
 		return (int)(Math.random()*((max-min)+1))+min;
 	}
 	
-	/*TODO REMOVE
-	public static Object toObject( @SuppressWarnings("rawtypes") Class clazz, String value ) {
-	    if( Boolean.class == clazz ) return Boolean.parseBoolean( value );
-	    if( Byte.class == clazz ) return Byte.parseByte( value );
-	    if( Short.class == clazz ) return Short.parseShort( value );
-	    if( Integer.class == clazz ) return Integer.parseInt( value );
-	    if( Long.class == clazz ) return Long.parseLong( value );
-	    if( Float.class == clazz ) return Float.parseFloat( value );
-	    if( Double.class == clazz ) return Double.parseDouble( value );
-	    return value;
-	}*/
-
 	private static final Orientable netherPortalEffect = (Orientable) Material.NETHER_PORTAL.createBlockData();
 	
+	/**
+	 * Get the nether portal BlockData for the axis
+	 * @param zAxis if the BlockData must have zAxis
+	 * @return NETHER_PORTAL BlockData facing the set Axis
+	 */
 	public static BlockData getNetherPortalEffect(boolean zAxis) {
 		netherPortalEffect.setAxis(zAxis?Axis.Z:Axis.X);
 		return netherPortalEffect;
 	}
 	
+	/**
+	 * Parse a location from a string
+	 * @param str the string containing the location
+	 * @param delim delimiter seperating the data
+	 * @return the parsed location
+	 */
 	public static Location parseLocationFromString(String str, String delim) {
 		String[] spl = str.split(delim);
 		return new Location(Bukkit.getWorld(spl[0]), Double.parseDouble(spl[1]), Double.parseDouble(spl[2]), Double.parseDouble(spl[3]));
 	}
-	
+
+	/**
+	 * Convert a location to string
+	 * @param loc the location to be stringified
+	 * @param delim the delimeter to seperate the data
+	 * @return the stringified location
+	 */
 	public static String locationToString(Location loc, String delim) {
 		return loc.getWorld().getName()+delim+loc.getX()+delim+loc.getY()+delim+loc.getZ();
 	}
 	
+	/**
+	 * Check if string can be parsed as integer
+	 * @param string string to check
+	 * @return true if string is integer
+	 */
 	public static boolean isInt(String string) {
 		try {
 			Integer.parseInt(string);
@@ -59,10 +85,20 @@ public class DimensionsUtils {
 	
 	 private static BlockFace[] radial = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
 
+	 /**
+	  * Get blockface from location yaw
+	  * @param yaw the yaw of the location
+	  * @return BlockFace from yaw
+	  */
 	 public static BlockFace yawToFace(float yaw) {
 		 return radial[Math.round(yaw / 45f) & 0x7];
 	 }
-
+	 
+	 /**
+	  * Check if the given BlockFace is placed along the Z Axis
+	  * @param face BlockFace to check
+	  * @return true if the BlockFace is WEST or EAST
+	  */
 	public static boolean isBlockFacezAxis(BlockFace face) {
 		return face==BlockFace.WEST || face==BlockFace.EAST;
 	}

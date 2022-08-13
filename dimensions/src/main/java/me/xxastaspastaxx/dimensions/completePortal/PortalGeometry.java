@@ -13,6 +13,11 @@ import org.bukkit.util.Vector;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 
+/**
+ * The class contains all the info about the portal structure
+ *
+ */
+
 public class PortalGeometry {
 	
 	private static HashMap<CustomPortal, PortalGeometry> customGeometry = new HashMap<CustomPortal, PortalGeometry>();
@@ -32,6 +37,9 @@ public class PortalGeometry {
 
 	private BoundingBox box;
 	
+	/**
+	 * DO NOT USE
+	 */
 	public static PortalGeometry instance;
 	
 	protected PortalGeometry(Vector min, Vector max) {
@@ -48,42 +56,74 @@ public class PortalGeometry {
 		box = BoundingBox.of(insideMin, insideMax);
 	}
 
+	/**
+	 * Get the bottom corner of the portal
+	 */
 	public Vector getMin() {
 		return min;
 	}
 
+	/**
+	 * Get the top corner of the portal
+	 */
 	public Vector getMax() {
 		return max;
 	}
 
+	/**
+	 * Get the bottom corner of the portal (inside the portal)
+	 */
 	public Vector getInsideMin() {
 		return insideMin;
 	}
 
+	/**
+	 * Get the top corner of the portal (inside the portal)
+	 */
 	public Vector getInsideMax() {
 		return insideMax;
 	}
 
+	/**
+	 * Check if the portal is built along the Z Axis
+	 */
 	public boolean iszAxis() {
 		return zAxis;
 	}
 	
+	/**
+	 * Get the center of the portal
+	 */
 	public Vector getCenter() {
 		return center;
 	}
 	
+	/**
+	 * Get the width of the portal
+	 */
 	public byte getPortalWidth() {
 		return portalWidth;
 	}
-
+	
+	/**
+	 * Get the height of the portal
+	 */
 	public byte getPortalHeight() {
 		return portalHeight;
 	}
 	
+	/**
+	 * Override the instance of the PortalGeometry
+	 * @param portal the portal to override the geometry for
+	 * @param geom the new instance of the portal geometry
+	 */
 	public static void setCustomGeometry(CustomPortal portal, PortalGeometry geom) {
 		customGeometry.put(portal, geom);
 	}
 	
+	/**
+	 * Get the PortalGeometry instance for the portal
+	 */
 	public static PortalGeometry getPortalGeometry(CustomPortal portal) {
 		if (customGeometry.containsKey(portal)) {
 			return customGeometry.get(portal);
@@ -92,10 +132,18 @@ public class PortalGeometry {
 		 }
 	}
 	
+	/**
+	 * Create PortalGeometry for a portal
+	 * @param min the bottom corner of the portal
+	 * @param max the top corner of the portal
+	 */
 	public PortalGeometry createGeometry(Vector min, Vector max) {
 		return new PortalGeometry(min, max);
 	}
 	
+	/**
+	 * Check if there is a portal structure at the location
+	 */
 	public PortalGeometry getPortal(CustomPortal customPortal, Location loc) {
 		 
 		 loc = loc.getBlock().getLocation();
@@ -161,6 +209,12 @@ public class PortalGeometry {
 		return new PortalGeometry(min, max);		 
 	}
 
+	/**
+	 * Check if the location is inside the portal
+	 * @param location the location
+	 * @param outside true to include the frame of the portal
+	 * @param corner true to include the corners of the portal
+	 */
 	public boolean isInside(Location location, boolean outside, boolean corner) {
 		//TODO remove?
 		location = location.getBlock().getLocation();
@@ -192,6 +246,12 @@ public class PortalGeometry {
 		return false;
 	}
 
+	/**
+	 * Build a portal
+	 * @param newLocation the location to build the portal
+	 * @param destinationWorld the world to build the portal at
+	 * @param customPortal
+	 */
 	public void buildPortal(Location newLocation, World destinationWorld, CustomPortal customPortal) {
 		
 		double maxY = (newLocation.getY()+portalHeight);

@@ -25,7 +25,7 @@ public class DimensionsWorldGuardFlags extends DimensionsAddon implements Listen
 	private WorldGuardFlags worldGuardFlags;
 	
 	public DimensionsWorldGuardFlags() {
-		super("DimensionsWorldGuardFlagsAddon", "3.0.0", "Add world guard flags for Dimensions portals", DimensionsAddonPriority.NORMAL);
+		super("DimensionsWorldGuardFlagsAddon", "3.0.1", "Add world guard flags for Dimensions portals", DimensionsAddonPriority.NORMAL);
 	}
 	
 	

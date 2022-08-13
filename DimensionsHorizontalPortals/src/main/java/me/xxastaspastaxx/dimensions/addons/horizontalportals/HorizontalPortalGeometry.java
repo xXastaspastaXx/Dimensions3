@@ -107,7 +107,8 @@ public class HorizontalPortalGeometry extends PortalGeometry {
 
 		return false;
 	}
-
+	
+	@Override
 	public void buildPortal(Location newLocation, World destinationWorld, CustomPortal customPortal) {
 		
 		double maxX = (newLocation.getX()+getPortalWidth());

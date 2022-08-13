@@ -26,6 +26,10 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
 import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
+/**
+ * Loads all the custom portals
+ */
+
 public class CustomPortalLoader {
 	
 	private static final String DIRECTORY_PATH = "./plugins/Dimensions/Portals";
@@ -37,6 +41,9 @@ public class CustomPortalLoader {
 	private static Method getCombinedIdMethod;
 	private static Method getStateMethod;
 	
+	/**
+	 * Cunstructor of the loader
+	 */
 	public CustomPortalLoader() {
 		try {
 			blockClass = MinecraftReflection.getBlockClass();
@@ -54,6 +61,9 @@ public class CustomPortalLoader {
 		}
 	}
 	
+	/**
+	 * Load all the custom portals
+	 */
 	public ArrayList<CustomPortal> loadAll() {
 		ArrayList<CustomPortal> res = new ArrayList<CustomPortal>();
 		
@@ -140,6 +150,12 @@ public class CustomPortalLoader {
 		return res;
 	}
 
+	/**
+	 * Creates combinedID for the block data inside the portal
+	 * @param insideBlockData
+	 * @param insideMaterial
+	 * @return
+	 */
 	public static int[] createCombinedID(BlockData[] insideBlockData, Material insideMaterial) {
 		int combinedId[] = new int[2];
 		if (insideMaterial.isSolid() || insideMaterial==Material.NETHER_PORTAL || insideMaterial==Material.END_GATEWAY) {
@@ -156,6 +172,12 @@ public class CustomPortalLoader {
 		return combinedId;
 	}
 
+	/**
+	 * Creates BlockData in the correct Z Axis
+	 * @param zAxis
+	 * @param blockData
+	 * @return
+	 */
 	public static BlockData getInsideBlockData(boolean zAxis, BlockData blockData) {
 		if (zAxis) {
 			if (blockData instanceof Orientable) {

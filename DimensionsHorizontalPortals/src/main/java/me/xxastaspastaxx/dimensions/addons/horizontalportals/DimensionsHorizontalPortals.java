@@ -34,7 +34,7 @@ public class DimensionsHorizontalPortals extends DimensionsAddon implements List
 	//private Plugin pl;
 	
 	public DimensionsHorizontalPortals() {
-		super("DimensionsHorizontalPortalsAddon", "3.0.1", "Horizontal portals", DimensionsAddonPriority.LOW);
+		super("DimensionsHorizontalPortalsAddon", "3.0.2", "Horizontal portals", DimensionsAddonPriority.LOW);
 	}
 	
 	@Override

@@ -14,6 +14,11 @@ import org.bukkit.plugin.RegisteredListener;
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 
+/**
+ * Loads and enables all the Dimensions addons
+ *
+ */
+
 public class DimensionsAddonManager {
 
 	private final String ADDONS_PATH = "./plugins/Dimensions/Addons/";
@@ -27,6 +32,10 @@ public class DimensionsAddonManager {
 	
 	private URL[] urls;
 	
+	/**
+	 * Constructor of the Addon manager. Creates the directory containing the addons and loads all the addons using ServiceLoader
+	 * @param pl The instance of the plugin
+	 */
 	public DimensionsAddonManager(Dimensions pl) {
 		this.pl = pl;
 		
@@ -56,6 +65,9 @@ public class DimensionsAddonManager {
 		}
 	}
 	
+	/**
+	 * Enable all the addons
+	 */
 	public void enableAddons() {
 		for (DimensionsAddon addon : loadedAddons) {
 			DimensionsDebbuger.MEDIUM.print("Enabling addon: "+addon.getName()+" v"+addon.getVersion());
@@ -88,6 +100,11 @@ public class DimensionsAddonManager {
 		
 	}*/
 
+	/**
+	 * Get the instance of the addon from the addon's name if loaded
+	 * @param addonName the name of the addon
+	 * @return the instance of the addon or null
+	 */
 	public DimensionsAddon getAddonByName(String addonName) {
 		for (DimensionsAddon addon : loadedAddons) {
 			if (addon.getName().contentEquals(addonName)) return addon;
@@ -95,10 +112,17 @@ public class DimensionsAddonManager {
 		return null;
 	}
 
+	/**
+	 * Get the list of the loaded addons
+	 * @return List of DimensionsAddon
+	 */
 	public ArrayList<DimensionsAddon> getAddons() {
 		return loadedAddons;
 	}
 	
+	/**
+	 * Disable all the addons
+	 */
 	public void onDisable() {
 		for (DimensionsAddon addon : loadedAddons) {
 			addon.onDisable();
@@ -106,7 +130,10 @@ public class DimensionsAddonManager {
 
 		DimensionsAddon.resetOptions();
 	}
-
+	
+	/**
+	 * Disable all addons and cancel their running tasks
+	 */
 	public void unloadAll() {
 
 		for (DimensionsAddon addon : loadedAddons) {
@@ -118,6 +145,11 @@ public class DimensionsAddonManager {
 	
 	ArrayList<String> dontUnload = new ArrayList<String>(Arrays.asList(new String[] {"me.xxastaspastaxx.dimensions.listener.PortalListener", "me.xxastaspastaxx.dimensions.commands.AddonCommand"}));
 	
+	/**
+	 * Unload the given addon
+	 * @param plugin the addon to unload
+	 * @return true
+	 */
 	public boolean unload(DimensionsAddon plugin) {
 		plugin.onDisable();
 		

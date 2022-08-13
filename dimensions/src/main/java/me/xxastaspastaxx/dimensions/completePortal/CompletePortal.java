@@ -26,6 +26,11 @@ import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 import me.xxastaspastaxx.dimensions.events.CustomPortalUseEvent;
 
+/**
+ * Class containing the info of a built portal
+ *
+ */
+
 public class CompletePortal {
 	
 	private CustomPortal customPortal;
@@ -50,6 +55,13 @@ public class CompletePortal {
 	
 	private HashMap<String, Object> tags = new HashMap<String, Object>();
 	
+	/**
+	 * Construct the CompletePortal
+	 * If <b>portalGeometry</b> is not null, create <a href="../PortalEntity.html">PortalEntities</a>
+	 * @param customPortal the customPortal that is built
+	 * @param world the world that is built
+	 * @param portalGeometry PortalGeometry of the portal
+	 */
 	public CompletePortal(CustomPortal customPortal, World world, PortalGeometry portalGeometry) {
 		this.customPortal = customPortal;
 		this.world = world;
@@ -79,6 +91,15 @@ public class CompletePortal {
 		}
 	}
 	
+	/**
+	 * Construct the CompletePortal
+	 * If <b>portalGeometry</b> is not null, create <a href="../PortalEntity.html">PortalEntities</a>
+	 * If <b>linked</b> is not null, links the portals
+	 * @param customPortal the customPortal that is built
+	 * @param world the world that is built
+	 * @param portalGeometry PortalGeometry of the portal
+	 * @param linked The portal to be linked with
+	 */
 	public CompletePortal(CustomPortal customPortal, World world, PortalGeometry portalGeometry, CompletePortal linked) {
 		this(customPortal, world, portalGeometry);
 		
@@ -87,50 +108,92 @@ public class CompletePortal {
 		linked.setLinkedPortal(this);
 	}
 	
+	
+	/**
+	 * Get the CustomPortal
+	 * @return the CustomPortal
+	 */
 	public CustomPortal getCustomPortal() {
 		return customPortal;
 	}
+	/**
+	 * Get the world of the portal
+	 * @return the world of the portal
+	 */
 	public World getWorld() {
 		return world;
 	}
+	/**
+	 * Get the portal geometry of the portal
+	 * @return the portal geometry of the portal
+	 */
 	public PortalGeometry getPortalGeometry() {
 		return portalGeometry;
 	}
 
+	/**
+	 * Get the portal that is linked with
+	 * @return null if there is no linked portal or the linked portal
+	 */
 	public CompletePortal getLinkedPortal() {
 		return linkedPortal;
 	}
+	/**
+	 * Unlink the portal
+	 */
 	public void unlinkPortal() {
 		linkedPortal = null;
 	}
+	
+	/**
+	 * Link to a portal
+	 * @param complete the portal to link to
+	 */
 	public void setLinkedPortal(CompletePortal complete) {
 		linkedPortal = complete;
 		lastLinkedWorld = complete.getWorld();
 	}
 	
+	/**
+	 * Get the center of the portal
+	 * @return the center of the portal
+	 */
 	public Location getCenter() {
 		return portalGeometry.getCenter().toLocation(world);
 	}
 	
+	/**
+	 * Get the PortalEntity list
+	 * @return the PortalEntity list
+	 */
 	public ArrayList<PortalEntity> getPortalEntities() {
 		return spawnedEntities;
 	}
 	
-	
+	/**
+	 * Check for nearby entities to teleport
+	 */
 	public void updatePortal() {
 		if (!isActive()) return;
+		//TODO fix entites teleporting even after leaving portal
 		
-		for (Entity en : world.getNearbyEntities(portalGeometry.getBoundingBox(), new Predicate<Entity>() {
+		world.getNearbyEntities(portalGeometry.getBoundingBox(), new Predicate<Entity>() {
 			@Override
 			public boolean test(Entity t) {
 				return !(t instanceof Player);
 			}
-		})) {
-			handleEntity(en);
-		}
+		}).forEach(en -> { if (!hasInHold(en)) {handleEntity(en);}});
 		
 	}
 	
+	/**
+	 * Start the teleport countdown for the entity if they are not in hold.
+	 * The delay for Creative and Spectator players is 0
+	 * Call the CustomPortalUseEvent and if its not cancelled the teleport the entity
+	 * @param en the entity to teleport
+	 * 
+	 * @see CustomPortalUseEvent
+	 */
 	public void handleEntity(Entity en) {
 		if (hold.contains(en)) return;
 		
@@ -145,6 +208,9 @@ public class CompletePortal {
 				Bukkit.getPluginManager().callEvent(useEvent);
 				
 				if (useEvent.isCancelled()) return; 
+
+				DimensionsSettings.metricsSave++;
+				
 				CompletePortal destination = useEvent.getDestinationPortal();
 				
 				//If no portal was put as a destination from other sources, we create our own
@@ -162,6 +228,8 @@ public class CompletePortal {
 				
 				Location teleportLocation = destination.getCenter().clone();
 				teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
+				teleportLocation.setYaw(en.getLocation().getYaw());
+				teleportLocation.setPitch(en.getLocation().getPitch());
 				
 				destination.pushToHold(en);
 				
@@ -174,10 +242,26 @@ public class CompletePortal {
 		//customPortal.usePortal(en, this);
 	}
 	
+	/**
+	 * Check if the location is inside the portal
+	 * @param loc location to check
+	 * @param outside true to count the frame of the portal
+	 * @param corner true to count the corners of the portal
+	 * @return true if the location is inside the portal
+	 */
 	public boolean isInsidePortal(Location loc, boolean outside, boolean corner) {
 		return loc.getWorld().equals(world) && portalGeometry.isInside(loc, outside, corner);
 	}
 	
+	/**
+	 * Calculate the teleport destination for the portal
+	 * Get the destination world if its not being overriden
+	 * Fix the world ratio using the world sizes
+	 * Fix the height ratio using the world min/max heights
+	 * @param overrideLocation override the location with this
+	 * @param overrideWorld override the world with this
+	 * @return the destination location to try and build an exit portal to use
+	 */
 	public Location getDestinationLocation(Location overrideLocation, World overrideWorld) {
 		Location newLocation = overrideLocation==null?getCenter():overrideLocation;
 
@@ -231,6 +315,13 @@ public class CompletePortal {
 		return newLocation;
 	}
 	
+	/**
+	 * Get the destination portal to use
+	 * @param buildNewPortal true to build an exit portal
+	 * @param overrideLocation location to override
+	 * @param overrideWorld world to override
+	 * @return the portal to use
+	 */
 	public CompletePortal getDestinationPortal(boolean buildNewPortal, Location overrideLocation, World overrideWorld) {
 
 		if (linkedPortal!=null) return linkedPortal;
@@ -273,6 +364,11 @@ public class CompletePortal {
 		return destination;
 	}
 	
+	/**
+	 * Calculate the world ratio from the world sizes
+	 * @param destinationWorld world to get the ratio from
+	 * @return the world ratio
+	 */
 	public double getWorldRatio(World destinationWorld) {
 
 		FileConfiguration conf = DimensionsSettings.getConfig();
@@ -283,7 +379,7 @@ public class CompletePortal {
 		
 		return ratio;
 	}
-
+	
 	private Location getSafeLocation(Location newLocation, boolean zAxis, World destinationWorld, int height, int width) {
 		Location backupLocation = null;
 		Location backupLocation2 = null;
@@ -385,7 +481,10 @@ public class CompletePortal {
 		return true;
 	}
 	
-	
+	/**
+	 * Set the block or summon the falling block entities for all the PortalEntities
+	 * @param p null to broadcast the packets or the player to send the packets to
+	 */
 	public void fill(Player p) {
 		if (getTag("hidePortalInside") != null) return;
 		if (p==null) {
@@ -422,6 +521,10 @@ public class CompletePortal {
 		}
 	}
 
+	/**
+	 * Despawn the entities or change the block to air inside the portal
+	 * @param p null to stop the running tasks or the player to play the destroy packet
+	 */
 	public void destroy(Player p) {
 		
 		if (p==null) {
@@ -431,7 +534,7 @@ public class CompletePortal {
 		world.playSound(getCenter(), customPortal.getBreakSound(), 1, 8);
 		
 		for (PortalEntity en : spawnedEntities) {
-			world.spawnParticle(Particle.BLOCK_CRACK, en.getLocation().clone().add(0.5,0.5,0.5), 10, customPortal.getInsideBlockData(false));
+			world.spawnParticle(Particle.BLOCK_CRACK, en.getLocation(), 10, customPortal.getInsideBlockData(false));
 			if (p==null)
 				en.destroyBroadcast();
 			else
@@ -439,18 +542,39 @@ public class CompletePortal {
 		}
 	}
 	
+	/**
+	 * Check if the portal is inside the given chunk
+	 * @param world2 the world of the chunk
+	 * @param x the X of the chunk
+	 * @param z the Z of the chunk
+	 * @return true if all match
+	 */
 	public boolean isInChunk(World world2, int x, int z) {
 		
 		return world.equals(world2) && chunkX==x && chunkZ==z;
 	}
 
+	/**
+	 * Add the entity to hold so it won't be teleported
+	 * @param en the entity to add
+	 */
 	public void pushToHold(Entity en) {
 		hold.add(en);
 	}
 
-	public boolean hasInHold(Player player) {
-		return hold.contains(player) || queue.containsKey(player);
+	/**
+	 * Check if the entity is on hold or in the queue to teleport
+	 * @param en the player to check
+	 * @return true if the player is in hold or queue
+	 */
+	public boolean hasInHold(Entity en) {
+		return hold.contains(en) || queue.containsKey(en);
 	}
+	
+	/**
+	 * Remove the entity from hold and cancel the teleport task
+	 * @param en the entity to remove
+	 */
 	public void removeFromHold(Entity en) {
 		hold.remove(en);
 		try {
@@ -459,7 +583,12 @@ public class CompletePortal {
 			
 		}
 	}
-
+	
+	/**
+	 * Set a portal tag (tags are stored even after restart)
+	 * @param key the key of the tag
+	 * @param value the value of the tag
+	 */
 	public void setTag(String key, Object value) {
 		if (value==null)
 			tags.remove(key);
@@ -467,18 +596,35 @@ public class CompletePortal {
 			tags.put(key, value);
 	}
 	
+	/**
+	 * Get the value of the tag
+	 * @param key
+	 * @return the value
+	 */
 	public Object getTag(String key) {
 		return tags.get(key);
 	}
 
+	/**
+	 * Get the portal tags
+	 * @return the portal tags
+	 */
 	public HashMap<String, Object> getTags() {
 		return tags;
 	}
 
+	/**
+	 * Override the portal tags
+	 * @param tags
+	 */
 	public void setTags(HashMap<String, Object> tags) {
 		this.tags = tags;
 	}
-
+	
+	/**
+	 * Check if the chunk the portal is in is loaded
+	 * @return true if chunk is loaded
+	 */
 	public boolean isActive() {
 		return world.isChunkLoaded(chunkX, chunkZ);
 	}

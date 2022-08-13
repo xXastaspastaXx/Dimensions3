@@ -4,12 +4,21 @@ import java.util.ArrayList;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 
+/**
+ * Manages all custom portals
+ *
+ */
+
 public class CustomPortalManager {
 	
 	Dimensions pl;
 	
 	ArrayList<CustomPortal> customPortals = new ArrayList<CustomPortal>();
 	
+	/**
+	 * Constructor of the manager
+	 * @param pl
+	 */
 	public CustomPortalManager(Dimensions pl) {
 		this.pl = pl;
 		
@@ -22,13 +31,20 @@ public class CustomPortalManager {
 	}
 
 
-
+	/**
+	 * Get all the custom portals registered
+	 * @return
+	 */
 	public ArrayList<CustomPortal> getCustomPortals() {
 		return customPortals;
 	}
 
 
-
+	/**
+	 * Get a custom portal by name
+	 * @param name the name of the portal
+	 * @return
+	 */
 	public CustomPortal getCustomPortal(String name) {
 		for (CustomPortal portal : customPortals) {
 			if (portal.getPortalId().contentEquals(name)) return portal;
@@ -37,7 +53,9 @@ public class CustomPortalManager {
 	}
 
 
-
+	/**
+	 * Reload all custom portals
+	 */
 	public void reload() {
 		customPortals.clear();
 		customPortals.addAll((new CustomPortalLoader()).loadAll());

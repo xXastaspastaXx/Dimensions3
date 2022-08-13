@@ -24,6 +24,11 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 
+/**
+ * Load all saved complete portals
+ *
+ */
+
 public class CompletePortalLoader {
 	
 	private static final String FILE_PATH = "./plugins/Dimensions/data/savedPortals.json";
@@ -31,6 +36,9 @@ public class CompletePortalLoader {
 	private Gson gson;
 	
 	
+	/**
+	 * Constructor of the portal loader
+	 */
 	public CompletePortalLoader() {
 		gson = new GsonBuilder().setPrettyPrinting().create();
 		
@@ -45,6 +53,10 @@ public class CompletePortalLoader {
 		}
 	}
 	
+	/**
+	 * Load all the portals from the .json file
+	 * @throws FileNotFoundException
+	 */
 	public void loadAll() throws FileNotFoundException {
 		Reader reader = new BufferedReader((new FileReader(FILE_PATH)));
 		ArrayList<HashMap<String, Object>> portals = gson.fromJson(reader, new TypeToken<ArrayList<HashMap<String, Object>>>() {}.getType());
@@ -77,7 +89,12 @@ public class CompletePortalLoader {
 		}
 	}
 	
+	/**
+	 * Save all portals inside the .json file
+	 * @param portals
+	 */
 	public void save(List<CompletePortal> portals) {
+		
 		ArrayList<HashMap<String, Object>> res = new ArrayList<HashMap<String, Object>>();
 		
 		for (CompletePortal portal : portals) {

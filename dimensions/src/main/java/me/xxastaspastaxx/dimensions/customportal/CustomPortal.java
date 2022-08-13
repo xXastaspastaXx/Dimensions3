@@ -20,6 +20,11 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
+/**
+ * The class that contains all the data for a new portal type
+ *
+ */
+
 public class CustomPortal {
 	
 	private String portalId;
@@ -53,10 +58,36 @@ public class CustomPortal {
 	private int teleportDelay;
 	private boolean enableParticles;
 	
-	HashMap<EntityType,EntityType> entityTransformationList;
-	int spawnDelayMin;
-	int spawnDelayMax;
-	HashMap<EntityType, Integer> entitySpawnList;
+	private HashMap<EntityType,EntityType> entityTransformationList;
+	private int spawnDelayMin;
+	private int spawnDelayMax;
+	private HashMap<EntityType, Integer> entitySpawnList;
+	
+	/**
+	 * Constructor of CustomPortal
+	 * @param portalId
+	 * @param displayName
+	 * @param enabled
+	 * @param outsideMaterial
+	 * @param outsideBlockDir
+	 * @param insideMaterial
+	 * @param lighterMaterial
+	 * @param particlesColor
+	 * @param breakSound
+	 * @param minimumHeight
+	 * @param maximumHeight
+	 * @param maximumWidth
+	 * @param minimumWidth
+	 * @param worldName
+	 * @param buildExitPortal
+	 * @param allowedWorldsList
+	 * @param teleportDelay
+	 * @param enableParticles
+	 * @param entityTransformationList
+	 * @param spawnDelayMin
+	 * @param spawnDelayMax
+	 * @param entitySpawnList
+	 */
 	public CustomPortal(String portalId, String displayName, boolean enabled, Material outsideMaterial, AxisOrFace outsideBlockDir,
 			Material insideMaterial, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
 			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, boolean buildExitPortal,
@@ -96,6 +127,9 @@ public class CustomPortal {
 		this.entitySpawnList = entitySpawnList;
 	}
 	
+	/**
+	 * The id of the portal (the file name without the .yml)
+	 */
 	public String getPortalId() {
 		return portalId;
 	}
@@ -114,10 +148,18 @@ public class CustomPortal {
 	public Material getInsideMaterial() {
 		return insideMaterial;
 	}
+	/**
+	 * Get the combined id to summon the fake blocks
+	 * @param zAxis true to get the ids for the Z axis
+	 */
 	public int getCombinedID(boolean zAxis) {
 		return combinedID[zAxis?1:0];
 	}
 	
+	/**
+	 * Get the BlockData to place the block
+	 * @param zAxis true to get the blockData for the Z axis
+	 */
 	public BlockData getInsideBlockData(boolean zAxis) {
 		return insideBlockData[zAxis?1:0];
 	}
@@ -186,6 +228,13 @@ public class CustomPortal {
 		return entitySpawnList;
 	}
 	
+	/**
+	 * Check if there is a portal structure at the location and ignite it
+	 * @param player the player igniting the portal
+	 * @param item the item used to ignite the portal
+	 * @param loc the location of the portal
+	 * @return null if there is no portal or the CompletePortal that was ignited
+	 */
 	public CompletePortal tryIgnite(Player player, ItemStack item, Location loc) {
 		if (item==null || item.getType()!=lighterMaterial) return null;
 		if (!isAllowedWorld(loc.getWorld())) return null;
@@ -196,10 +245,19 @@ public class CustomPortal {
 		
 	}
 	
+	/**
+	 * Check if the block is portal block
+	 * @param block the block to check
+	 * @return true if the block is accepted
+	 */
 	public boolean isPortalBlock(Block block) {
 		return block.getType()==outsideMaterial && outsideBlockDir.isData(block.getBlockData());
 	}
-
+	
+	/**
+	 * Override the inside block data
+	 * @param blockData
+	 */
 	public void setInsideBlockData(BlockData blockData) {
 		insideBlockData = new BlockData[] {CustomPortalLoader.getInsideBlockData(false, blockData.clone()),CustomPortalLoader.getInsideBlockData(true, blockData.clone())};
 		combinedID = CustomPortalLoader.createCombinedID(insideBlockData, blockData.getMaterial());

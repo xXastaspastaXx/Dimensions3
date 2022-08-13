@@ -9,6 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 
+/**
+ * Event called when a portal is being ignited
+ *
+ */
+
 public class CustomPortalIgniteEvent extends Event implements Cancellable {
 
 	private static final HandlerList HANDLERS = new HandlerList();
@@ -20,6 +25,13 @@ public class CustomPortalIgniteEvent extends Event implements Cancellable {
 	private Entity entity;
 	private ItemStack lighter;
 	
+	/**
+	 * Constructor of the event
+	 * @param completePortal portal being ignited
+	 * @param cause the cause igniting the portal
+	 * @param entity the entity causing the ignite
+	 * @param item the item used to ignite
+	 */
     public CustomPortalIgniteEvent(CompletePortal completePortal, CustomPortalIgniteCause cause, Entity entity, ItemStack item) {
     	this.completePortal = completePortal;
     	this.cause = cause;
@@ -28,22 +40,39 @@ public class CustomPortalIgniteEvent extends Event implements Cancellable {
 	}
 
     
-    
+    /**
+     * Get the portal being ignited
+     */
 	public CompletePortal getCompletePortal() {
 		return completePortal;
 	}
 	
+	/**
+	 * Replace the portal being ignited with a new portal instance
+	 * @param newPortal instance of the new portal
+	 */
 	public void replaceCompletePortal(CompletePortal newPortal) {
 		this.completePortal = newPortal;
 	}
-
+	
+	/**
+	 * The cause igniting the portal
+	 */
 	public CustomPortalIgniteCause getCause() {
 		return cause;
 	}
 	
+	/**
+	 * The entity igniting the portal
+	 * @return null if no entity was involved
+	 */
 	public Entity getEntity() {
 		return entity;
 	}
+	/**
+	 * The item used to ignite the portal
+	 * @return null if no item was involved
+	 */
 	public ItemStack getLighter() {
 		return lighter;
 	}

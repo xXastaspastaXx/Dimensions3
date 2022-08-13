@@ -28,14 +28,4 @@ dimensions/.metadata/.lock
 *.gitignore
 *.jar
 *.class
-DimensionsBungeeAddon/*
-DimensionsBungeePlugin/*
-DimensionsPatreonCosmetics/*
-DimensionsCommandsOnUse/*
-DimensionsCustomLighter/*
-DimensionsLimitedUses/*
-DimensionsParticles/*
-DimensionsPastedPortals/*
-DimensionsStylishPortals/*
-DimensionsTimedPortals/*
-
+test/*

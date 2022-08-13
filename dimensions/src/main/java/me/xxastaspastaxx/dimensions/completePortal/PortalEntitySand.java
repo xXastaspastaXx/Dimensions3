@@ -12,6 +12,11 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityTeleport;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
+/**
+ * The PortalEntity that sends players packets of spawning falling sand with textures of blocks
+ *
+ */
+
 public class PortalEntitySand extends PortalEntity {
 
 	private int fallingBlockId;
@@ -22,6 +27,11 @@ public class PortalEntitySand extends PortalEntity {
 	private WrappedDataWatcher dataWatcher;
 	private WrapperPlayServerEntityDestroy destroyPacket;
 	
+	/**
+	 * Construct the PortalEntity and create all the packets to summon, retexture, teleport and destroy the falling block
+	 * @param location the location to summon the entity
+	 * @param combinedID the combinedID of the texture
+	 */
 	public PortalEntitySand(Location location, int combinedID) {
 		super(location);
 		fallingBlockId =  (int) (Math.random() * Integer.MAX_VALUE);
@@ -78,18 +88,28 @@ public class PortalEntitySand extends PortalEntity {
 			destroyPacket.setEntityIds(fallingBlockId);
 	}
 
+	/**
+	 * Send the spawn packets to the player
+	 */
 	public void summon(Player p) {
 		spawnPacket.sendPacket(p);
 		teleportPacket.sendPacket(p);
 		metaPacket.sendPacket(p);
 	}
 	
+	/**
+	 * Send the destroy packets to the player
+	 */
 	public void destroy(Player p) {
 		destroyPacket.sendPacket(p);
 		
 		p.sendBlockChange(getLocation(),getLocation().getBlock().getBlockData());
 	}
 
+	/**
+	 * Send the destroy packets to all players
+	 */
+	
 	public void destroyBroadcast() {
 		destroyPacket.broadcastPacket();
 		
