@@ -1,2 +1,3 @@
 # Dimensions3
- The third rewrite of Dimensions :'(
+ Spigot page: https://www.spigotmc.org/resources/dimensions-custom-portals.57542/
+ Wiki: https://astaspastagam.gitbook.io/first-steps/
