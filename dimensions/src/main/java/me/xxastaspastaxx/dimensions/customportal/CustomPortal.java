@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import me.xxastaspastaxx.dimensions.AxisOrFace;
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
@@ -215,6 +216,14 @@ public class CustomPortal {
 		return enableParticles;
 	}
 
+	public int getMinSpawnTime() {
+		return spawnDelayMin;
+	}
+	
+	public int getMaxSpawnTime() {
+		return spawnDelayMax;
+	}
+	
 	public HashMap<EntityType, EntityType> getEntityTransformationList() {
 		return entityTransformationList;
 	}
@@ -262,5 +271,34 @@ public class CustomPortal {
 		insideBlockData = new BlockData[] {CustomPortalLoader.getInsideBlockData(false, blockData.clone()),CustomPortalLoader.getInsideBlockData(true, blockData.clone())};
 		combinedID = CustomPortalLoader.createCombinedID(insideBlockData, blockData.getMaterial());
 		
+	}
+
+	/**
+	 * Get the next entity type to spawn from the list
+	 */
+	public EntityType getNextSpawn() {
+		return entitySpawnList.keySet().stream().filter(type -> entitySpawnList.get(type)>=DimensionsUtils.getRandom(0, 100)).findAny().orElse(null);
+	}
+	
+	/**
+	 * Get if the portal spawns entities
+	 */
+	public boolean canSpawnEntities() {
+		return !entitySpawnList.isEmpty();
+	}
+	
+	/**
+	 * Get a random spawn delay for the spawn task
+	 */
+	public int getSpawnDelay() {
+		return DimensionsUtils.getRandom(spawnDelayMin, spawnDelayMax)/50;
+	}
+
+	/**
+	 * Get entitity transformatioion
+	 * @param the type of entity using the portal
+	 */
+	public EntityType getEntityTransformation(EntityType type) {
+		return entityTransformationList.get(type);
 	}
 }

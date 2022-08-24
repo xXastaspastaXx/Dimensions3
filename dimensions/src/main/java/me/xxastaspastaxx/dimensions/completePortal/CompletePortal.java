@@ -12,14 +12,19 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
@@ -39,8 +44,9 @@ public class CompletePortal {
 	private World world;
 	private int chunkX;
 	private int chunkZ;
-	
+
 	private int particlesTask;
+	private int entitiesTask;
 	
 	//We store the last linked world in case the plugin needs to return the player to the world he came from but for some reason the portal is broken
 	private CompletePortal linkedPortal;
@@ -170,20 +176,28 @@ public class CompletePortal {
 		return spawnedEntities;
 	}
 	
+	
+	private ArrayList<Entity> savedEntities = new ArrayList<Entity>();
 	/**
 	 * Check for nearby entities to teleport
 	 */
 	public void updatePortal() {
 		if (!isActive()) return;
 		//TODO fix entites teleporting even after leaving portal
-		
-		world.getNearbyEntities(portalGeometry.getBoundingBox(), new Predicate<Entity>() {
+
+		savedEntities.addAll(world.getNearbyEntities(portalGeometry.getBoundingBox(), new Predicate<Entity>() {
 			@Override
 			public boolean test(Entity t) {
-				return !(t instanceof Player);
+				return !savedEntities.contains(t) && !(t instanceof Player);
 			}
-		}).forEach(en -> { if (!hasInHold(en)) {handleEntity(en);}});
+		}));
 		
+		ArrayList<Entity> toRemove = new ArrayList<Entity>();
+		savedEntities.stream().filter(en -> !isInsidePortal(en.getLocation(), false, false)).forEach(en -> toRemove.add(en));
+		
+		toRemove.forEach(en -> {removeFromHold(en); savedEntities.remove(en);});
+		
+		savedEntities.forEach(en -> { if (!hasInHold(en)) {handleEntity(en);}});
 	}
 	
 	/**
@@ -206,7 +220,7 @@ public class CompletePortal {
 			public void run() {
 				CustomPortalUseEvent useEvent = new CustomPortalUseEvent(CompletePortal.this, en, getDestinationPortal(false, null, null));
 				Bukkit.getPluginManager().callEvent(useEvent);
-				
+
 				if (useEvent.isCancelled()) return; 
 
 				DimensionsSettings.metricsSave++;
@@ -226,15 +240,27 @@ public class CompletePortal {
 					}
 				}
 				
+				
 				Location teleportLocation = destination.getCenter().clone();
 				teleportLocation.setY(destination.getPortalGeometry().getInsideMin().getY());
 				teleportLocation.setYaw(en.getLocation().getYaw());
 				teleportLocation.setPitch(en.getLocation().getPitch());
 				
-				destination.pushToHold(en);
+				EntityType trasnformation = customPortal.getEntityTransformation(en.getType());
+				if (trasnformation==null) {
+					destination.pushToHold(en);
+					en.teleport(teleportLocation);
+
+					removeFromHold(en);
+				} else {
+					Entity newEn = teleportLocation.getWorld().spawnEntity(teleportLocation, trasnformation);
+
+					DimensionsUtils.cloneEntity(en, newEn);
+					destination.pushToHold(newEn);
+					
+					en.remove();
+				}
 				
-				en.teleport(teleportLocation);
-				removeFromHold(en);
 				
 			}
 		}, delay));
@@ -486,6 +512,27 @@ public class CompletePortal {
 	 * @param p null to broadcast the packets or the player to send the packets to
 	 */
 	public void fill(Player p) {
+		if (p==null && customPortal.canSpawnEntities()) {
+
+			Bukkit.getScheduler().cancelTask(entitiesTask);
+			entitiesTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Dimensions.getInstance(), new Runnable() {
+				
+				@Override
+				public void run() {
+					if (!isActive()) return;
+					
+					EntityType type = customPortal.getNextSpawn();
+					if (type==null) return;
+					
+					Location spawnLoc = getCenter().clone();
+					spawnLoc.setY(portalGeometry.getInsideMin().getY());
+					
+					Entity en = world.spawnEntity(spawnLoc, type);
+					pushToHold(en);
+				}
+			}, customPortal.getSpawnDelay(), customPortal.getSpawnDelay());
+		}
+		
 		if (getTag("hidePortalInside") != null) return;
 		if (p==null) {
 			Bukkit.getScheduler().cancelTask(particlesTask);
@@ -494,7 +541,9 @@ public class CompletePortal {
 					
 					@Override
 					public void run() {
-						if (getTag("hidePortalParticles")!=null) return;
+						
+						
+						if (!isActive() || getTag("hidePortalParticles")!=null) return;
 						for (PortalEntity en : spawnedEntities) {
 							en.emitParticles(customPortal.getParticlesColor());
 						}
@@ -529,6 +578,7 @@ public class CompletePortal {
 		
 		if (p==null) {
 			Bukkit.getScheduler().cancelTask(particlesTask);
+			Bukkit.getScheduler().cancelTask(entitiesTask);
 		}
 		
 		world.playSound(getCenter(), customPortal.getBreakSound(), 1, 8);

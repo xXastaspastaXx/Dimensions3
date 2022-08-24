@@ -33,10 +33,11 @@ public class Dimensions extends JavaPlugin {
 		new DimensionsSettings(this);
 		
 		addonsManager = new DimensionsAddonManager(this);
+		
 	}
 	
 	public void onEnable() {
-
+		
 		commandManager = new DimensionsCommandManager(this);
 		
 		addonsManager.enableAddons();

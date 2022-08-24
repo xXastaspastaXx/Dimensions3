@@ -4,10 +4,14 @@ import org.bukkit.Axis;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Orientable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 /**
  * Contains methods that are commonly used
  *
@@ -101,6 +105,55 @@ public class DimensionsUtils {
 	  */
 	public static boolean isBlockFacezAxis(BlockFace face) {
 		return face==BlockFace.WEST || face==BlockFace.EAST;
+	}
+
+	public static void cloneEntity(Entity en, Entity newEn) {
+		newEn.setCustomName(en.getCustomName());
+		newEn.setCustomNameVisible(en.isCustomNameVisible());
+		newEn.setFallDistance(en.getFallDistance());
+		newEn.setFireTicks(en.getFireTicks());
+		newEn.setFreezeTicks(en.getFreezeTicks());
+		newEn.setGlowing(en.isGlowing());
+		newEn.setGravity(en.hasGravity());
+		newEn.setInvulnerable(en.isInvulnerable());
+		newEn.setLastDamageCause(en.getLastDamageCause());
+		newEn.setOp(en.isOp());
+		newEn.setPersistent(en.isPersistent());
+		newEn.setPortalCooldown(en.getPortalCooldown());
+		newEn.setSilent(en.isSilent());
+		newEn.setTicksLived(en.getTicksLived());
+		newEn.setVelocity(en.getVelocity());
+		newEn.setVisualFire(en.isVisualFire());
+		en.getPassengers().forEach(passenger -> newEn.addPassenger(passenger));
+		en.getScoreboardTags().forEach(tag -> newEn.addScoreboardTag(tag));
+		if (en.getVehicle()!=null) en.getVehicle().addPassenger(newEn);
+		
+		
+		if (en instanceof LivingEntity && newEn instanceof LivingEntity) {
+			LivingEntity newEn2 = (LivingEntity) newEn;
+			LivingEntity en2 = (LivingEntity) en;
+
+			en2.getActivePotionEffects().forEach(ef -> newEn2.addPotionEffect(ef));
+			newEn2.setAbsorptionAmount(en2.getAbsorptionAmount());
+			newEn2.setAI(en2.hasAI());
+			newEn2.setArrowCooldown(en2.getArrowCooldown());
+			newEn2.setArrowsInBody(en2.getArrowsInBody());
+			newEn2.setCanPickupItems(en2.getCanPickupItems());
+			newEn2.setCollidable(en2.isCollidable());
+			newEn2.setGliding(en2.isGliding());
+			newEn2.setHealth(newEn2.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()/(en2.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()/en2.getHealth()));
+
+			for (Attribute at : Attribute.values()) {
+				AttributeInstance enAt = en2.getAttribute(at);
+				AttributeInstance newEnAt = newEn2.getAttribute(at);
+				if (enAt==null || newEnAt==null) continue;
+				
+				newEnAt.setBaseValue(enAt.getBaseValue());
+				enAt.getModifiers().forEach(m -> newEnAt.addModifier(m));
+			}
+
+		}
+		
 	}
 	
 }

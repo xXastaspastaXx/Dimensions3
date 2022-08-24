@@ -53,7 +53,7 @@ public class PortalGeometry {
 		this.portalWidth = (byte) (!zAxis?max.getX()-min.getX():max.getZ()-min.getZ());
 		this.portalHeight = (byte) (max.getY()-min.getY());
 		
-		box = BoundingBox.of(insideMin, insideMax);
+		box = BoundingBox.of(insideMin, insideMax.clone().add(new Vector(zAxis?1:0,0,zAxis?0:1)));
 	}
 
 	/**

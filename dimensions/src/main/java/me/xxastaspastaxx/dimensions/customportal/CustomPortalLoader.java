@@ -131,8 +131,15 @@ public class CustomPortalLoader {
 				entityTransformation.put(EntityType.valueOf(spl[0]), EntityType.valueOf(spl[1]));
 			}
 			
-			String[] spawningDelayString = portalConfig.getString("Entities.Spawning.Delay", "5000-10000").split("-");
-			int[] spawningDelay = {Integer.parseInt(spawningDelayString[0]),Integer.parseInt(spawningDelayString[1])};
+			String s = portalConfig.getString("Entities.Spawning.Delay", "5000-10000");
+			int[] spawningDelay = new int[2]; 
+			if (s.contains("-")) {
+				String[] spawningDelayString = s.split("-");
+				spawningDelay = new int[] {Integer.parseInt(spawningDelayString[0]),Integer.parseInt(spawningDelayString[1])};
+			} else {
+				int delay = Integer.parseInt(s);
+				spawningDelay = new int[] {delay, delay};
+			}
 			HashMap<EntityType,Integer> entitySpawning = new HashMap<EntityType,Integer>();
 			for (String entity : portalConfig.getStringList("Entities.Spawning.List")) {
 				String[] spl = entity.toUpperCase().split(";");
