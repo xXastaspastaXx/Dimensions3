@@ -139,7 +139,7 @@ public class PortalListener implements Listener {
 		if (complTo!=null) {
 			p.sendBlockChange(to, DimensionsUtils.getNetherPortalEffect(complTo.getPortalGeometry().iszAxis()));
 		}
-		if (complFrom!=null) {
+		if (DimensionsSettings.enableNetherPortalEffect && complFrom!=null) {
 			if (complFrom.getPortalEntities().get(0) instanceof PortalEntitySolid) {
 				p.sendBlockChange(from, complFrom.getCustomPortal().getInsideBlockData(complFrom.getPortalGeometry().iszAxis()));
 			} else {
