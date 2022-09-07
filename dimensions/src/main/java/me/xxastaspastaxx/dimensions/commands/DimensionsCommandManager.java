@@ -15,13 +15,14 @@ import me.xxastaspastaxx.dimensions.Dimensions;
 
 public class DimensionsCommandManager implements CommandExecutor {
 
-    private static ArrayList<DimensionsCommand> commands = new ArrayList<DimensionsCommand>();
+    private ArrayList<DimensionsCommand> commands = new ArrayList<DimensionsCommand>();
     
     /**
      * Contruct the manager and set the command executor for the command /dimensions
      * @param main the instance of the Dimensions lpugin
      */
     public DimensionsCommandManager(Dimensions main) {
+    	
     	commands.add(new HelpCommand("help", "", new String[] {"h"}, "List all commands", "none", false));
     	commands.add(new AdminHelpCommand("adminHelp", "", new String[] {"ah"}, "List all admin commands", "", false));
     	commands.add(new PermissionsCommand("permissions", "", new String[] {"perms"}, "List all commands with their permissions", "", true));
@@ -70,7 +71,7 @@ public class DimensionsCommandManager implements CommandExecutor {
 	 * Get the list of the non-admin commands
 	 * @return the list of the non-admin commands
 	 */
-	public static ArrayList<DimensionsCommand> getCommands() {
+	public ArrayList<DimensionsCommand> getCommands() {
 		ArrayList<DimensionsCommand> res = new ArrayList<DimensionsCommand>();
 		for (DimensionsCommand cmd : commands) {
 			if (cmd.isAdminCommand()) continue;
@@ -83,7 +84,7 @@ public class DimensionsCommandManager implements CommandExecutor {
 	 * Get the list of the admin commands
 	 * @return the list of the admin commands
 	 */
-	public static ArrayList<DimensionsCommand> getAdminCommands() {
+	public ArrayList<DimensionsCommand> getAdminCommands() {
 		ArrayList<DimensionsCommand> res = new ArrayList<DimensionsCommand>();
 		for (DimensionsCommand cmd : commands) {
 			if (!cmd.isAdminCommand()) continue;

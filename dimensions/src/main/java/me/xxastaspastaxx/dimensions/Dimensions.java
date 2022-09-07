@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
@@ -29,34 +30,47 @@ public class Dimensions extends JavaPlugin {
 	public void onLoad() {
 		
 		instance = this;
-		
+
+		DimensionsDebbuger.VERY_LOW.print("Loading Dimensions settings...");
 		new DimensionsSettings(this);
-		
+
+		DimensionsDebbuger.VERY_LOW.print("Loading addons...");
 		addonsManager = new DimensionsAddonManager(this);
+		DimensionsDebbuger.VERY_LOW.print("Loaded "+addonsManager.getAddons().size()+" addons.");
 		
 	}
 	
 	public void onEnable() {
-		
+
+		DimensionsDebbuger.DEBUG.print("Registering commands...");
 		commandManager = new DimensionsCommandManager(this);
 		
+		DimensionsDebbuger.VERY_LOW.print("Enabling addons...");
 		addonsManager.enableAddons();
 		
-		DimensionsDebbuger.DEBUG.print("Loading portals...");
+		DimensionsDebbuger.VERY_LOW.print("Loading portals...");
 		customPortalManager = new CustomPortalManager(this);
+		DimensionsDebbuger.MEDIUM.print("Found "+customPortalManager.getCustomPortals().size()+" portals.");
 		completePortalManager = new CompletePortalManager(this);
 		
+
+		DimensionsDebbuger.DEBUG.print("Registering Listener class...");
 		new PortalListener(this);
 		
 		//Use a task in order to load portals only after all plugins have loaded and have generated/loaded their worlds
 		//Portals require a world instance in order to be loaded and we can only have that if the plugin has loaded the required worlds
+
+		DimensionsDebbuger.DEBUG.print("Dimensions has been loaded. Waiting for server to tick before loading saved portals...");
 		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
 			
 			@Override
 			public void run() {
 				
 				DimensionsSettings.setDefaultWorld();
+
+				DimensionsDebbuger.DEBUG.print("Loading saved portals...");
 				completePortalManager.loadAll();
+				DimensionsDebbuger.DEBUG.print("Loading complete...");
 				
 			}
 		}, 1);
@@ -103,18 +117,13 @@ public class Dimensions extends JavaPlugin {
 	            }
 	            return map;
 	        }));
-	        
-	        metrics.addCustomChart(new Metrics.SingleLineChart("total_portal_uses", () -> DimensionsSettings.metricsSave));
 	}
 	
 	public void reload() {
 		addonsManager.unloadAll();
 		completePortalManager.save();
+		HandlerList.unregisterAll(this);
 		
-		
-
-		getConfig().set("metricsSave", DimensionsSettings.metricsSave);
-		saveConfig();
 		new DimensionsSettings(this);
 		DimensionsSettings.setDefaultWorld();
 
@@ -124,13 +133,14 @@ public class Dimensions extends JavaPlugin {
 
 		customPortalManager = new CustomPortalManager(this);
 		completePortalManager = new CompletePortalManager(this);
+		
+		new PortalListener(this);
+		
 		completePortalManager.loadAll();
 	}
 	
 	public void onDisable() {
-
-		getConfig().set("metricsSave", DimensionsSettings.metricsSave);
-		saveConfig();
+		
 		addonsManager.onDisable();
 		completePortalManager.save();
 	}

@@ -1,8 +1,9 @@
 package me.xxastaspastaxx.dimensions;
 
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
 
 /**
  * Use static instances of the class to print debug messages to the appropriate debug level set in the config
@@ -36,9 +37,10 @@ public class DimensionsDebbuger {
 	 */
 	public void print(Object... str) {
 		if (DimensionsSettings.debugLevel>=level)
-			Dimensions.getInstance().getLogger().log(Level.INFO, String.join(", ",Arrays.asList(str).stream()
-                    .map(Object::toString)
+			Bukkit.getConsoleSender().sendMessage("§7[§cDimensions§7] §r"+String.join(", ",Arrays.asList(str).stream()
+					.map((s) -> s==null?"null":s.toString())
                     .collect(Collectors.toList())));
 	}
+
 			
 }

@@ -6,10 +6,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.RegisteredListener;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
@@ -55,12 +56,20 @@ public class DimensionsAddonManager {
 	    this.urls = urls.toArray(new URL[0]);
 		loader = ServiceLoader.load(DimensionsAddon.class, URLClassLoader.newInstance(this.urls, Dimensions.class.getClassLoader()));
 		
-		for (DimensionsAddon addon : loader) {
-			if (addon.onLoad(pl)) {
-				DimensionsDebbuger.MEDIUM.print("Loaded addon: "+addon.getName()+" v"+addon.getVersion());
-				loadedAddons.add(addon);
-			} else {
-				DimensionsDebbuger.MEDIUM.print("Failed to load addon: "+addon.getName()+" v"+addon.getVersion());
+		Iterator<DimensionsAddon> iter = loader.iterator();
+		while (iter.hasNext()) {
+			try {
+				DimensionsAddon addon = iter.next();
+				if (addon.onLoad(pl)) {
+					DimensionsDebbuger.MEDIUM.print("Loaded addon: "+addon.getName()+" v"+addon.getVersion());
+					loadedAddons.add(addon);
+				} else {
+					DimensionsDebbuger.MEDIUM.print("Failed to load addon: "+addon.getName()+" v"+addon.getVersion());
+				}
+			} catch (ServiceConfigurationError e) {
+				String addonName = e.getMessage().substring(e.getMessage().lastIndexOf('.')+1);
+				addonName = addonName.substring(0,addonName.indexOf(' ')-1);
+				DimensionsDebbuger.MEDIUM.print("Failed to load addon: "+addonName);
 			}
 		}
 	}
@@ -153,13 +162,15 @@ public class DimensionsAddonManager {
 	public boolean unload(DimensionsAddon plugin) {
 		plugin.onDisable();
 		
-		for (RegisteredListener r : HandlerList.getRegisteredListeners(pl)) {
-			String s = r.getListener().getClass().getName();
-			if (dontUnload.contains(s)) continue;
-			
-			HandlerList.unregisterAll(r.getListener());
-		}
-		
+		HandlerList.getRegisteredListeners(pl).stream().filter(r -> !dontUnload.contains(r.getListener().getClass().getName())).forEach(r -> HandlerList.unregisterAll(r.getListener()));
+//		
+//		for (RegisteredListener r : HandlerList.getRegisteredListeners(pl)) {
+//			String s = r.getListener().getClass().getName();
+//			if (dontUnload.contains(s)) continue;
+//			
+//			HandlerList.unregisterAll(r.getListener());
+//		}
+//		
 		return true;
     }
 

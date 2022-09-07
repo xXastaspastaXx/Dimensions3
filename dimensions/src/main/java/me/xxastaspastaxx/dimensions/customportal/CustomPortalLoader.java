@@ -32,9 +32,9 @@ import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
 public class CustomPortalLoader {
 	
-	private static final String DIRECTORY_PATH = "./plugins/Dimensions/Portals";
-	private static final File PORTALS_DIRECTORY = new File(DIRECTORY_PATH);
-	private static final String CONFIG_VERSION = "3.0.0";
+	public static final String DIRECTORY_PATH = "./plugins/Dimensions/Portals";
+	public static final File PORTALS_DIRECTORY = new File(DIRECTORY_PATH);
+	public static final String CONFIG_VERSION = "3.0.0";
 	
 	private static Class<?> blockClass;
 	private static Class<?> craftBlockDataClass;

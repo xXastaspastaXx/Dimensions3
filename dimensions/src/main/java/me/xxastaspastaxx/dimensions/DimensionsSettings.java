@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class DimensionsSettings {
 	
 	/**Config version for verion control */
-	private static final double configVersion = 0.9;
+	private static final double configVersion = 1.0;
 	
 	/**Search radius for nearby portals */
 	public static int searchRadius = 128;
@@ -28,6 +28,9 @@ public class DimensionsSettings {
 
 	/**Radius to search for a safe place to build a portal */
 	public static int safeSpotSearchRadius = 16;
+	/**Allow in order to not serach for safeSpotSearchRadius blocks in height but for the whole world height */
+	public static boolean safeSpotSearchAllY = true;
+	
 	/**The world that portals will teleport to when they dont know where to lead */
 	public static World fallbackWorld = null;
 	/**The level of the debug messages in the console */
@@ -42,8 +45,6 @@ public class DimensionsSettings {
 	public static boolean enableEntitiesTeleport = false;
 	/**Check for entities inside the portal every set ticks */
 	public static long updateEveryTick = 7;
-	/**Variable storing the total portal uses inside the server for Metrics */
-	public static int metricsSave = 0;
 	
 	
 	private static FileConfiguration config;
@@ -100,20 +101,6 @@ public class DimensionsSettings {
 	/**Get the ./plugins/Dimensions/config.yml instance of FileConfiguration */
 	public static FileConfiguration getConfig() {
 		return config;
-	}
-	
-	public void reload() {
-		Field[] fields = this.getClass().getDeclaredFields();
-		for (Field field : fields) {
-			if (field.getName().equals("fallbackWorld") || field.getName().startsWith("config") || field.getName().equals("main")) continue;
-			
-			try {
-				field.set(this.getClass(), config.get(field.getName(), field.get(this.getClass())));
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			
-		}
 	}
 	
 }

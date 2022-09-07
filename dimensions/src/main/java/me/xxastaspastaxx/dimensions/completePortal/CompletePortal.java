@@ -12,19 +12,15 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
-import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
@@ -221,9 +217,7 @@ public class CompletePortal {
 				CustomPortalUseEvent useEvent = new CustomPortalUseEvent(CompletePortal.this, en, getDestinationPortal(false, null, null));
 				Bukkit.getPluginManager().callEvent(useEvent);
 
-				if (useEvent.isCancelled()) return; 
-
-				DimensionsSettings.metricsSave++;
+				if (useEvent.isCancelled()) return;
 				
 				CompletePortal destination = useEvent.getDestinationPortal();
 				
@@ -411,69 +405,80 @@ public class CompletePortal {
 		Location backupLocation2 = null;
 		Location checkLocation;
 	
-//		int minWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MinHeight", 0);
-//		int maxWorldHeight = (int) DimensionsSettings.get("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
+		int minWorldHeight = DimensionsSettings.getConfig().getInt("Worlds."+destinationWorld.getName()+".MinHeight", -60);
+		int maxWorldHeight = DimensionsSettings.getConfig().getInt("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
 		
 		for (int m =0;m<DimensionsSettings.safeSpotSearchRadius;m++) {
 			checkLocation = newLocation.clone();
 
+			boolean isCenter = !DimensionsSettings.safeSpotSearchAllY || m<DimensionsSettings.safeSpotSearchRadius-1;
+			//tp 3042.23 109.00 2005.12
+			///tp 2039.49 108.00 1006.62
 			int y = 0;
 			int yAdd = 1;
-			while (y!=m+1) {
+			boolean step1 = true;
+			while ((isCenter && y!=m+1) || !isCenter) {
 				checkLocation.setY(newLocation.getY()+y);
+				if (checkLocation.getY()>=minWorldHeight && checkLocation.getY()<=maxWorldHeight-height) {
+					step1 = true;
+					
+					int dir = 0; 
+	
+					int x = 0;
+					int z = 0;
+					float travel = 1;
+					if (!(y>=m || y<=-m)) {
+						travel = m*2-0.5f;
+						x=-m+1;
+						z=m;
+						dir = 1;
+					}
+					int travelCurr = (int) travel;
+					// 0 up
+					// 1 right
+					// 2 down
+					// 3 left
+					while (x!=-m || z!=m+1) {
+	
+						checkLocation.setZ(newLocation.getZ()+z);
+						checkLocation.setX(newLocation.getX()+x);
+						
+						if (destinationWorld.getWorldBorder().isInside(checkLocation)) {
+							
+							//TODO check location
+							if (canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, true)) return checkLocation;
+							if (backupLocation==null && canBuildPortal(checkLocation, !zAxis, destinationWorld, height, width, true)) backupLocation = checkLocation.clone();
+							if (backupLocation2==null && canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, false)) backupLocation2 = checkLocation.clone();
+						}
+						
+						switch (dir) {
+							case 0:
+								z++;
+								break;
+							case 1:
+								x++;
+								break;
+							case 2:
+								z--;
+								break;
+							case 3:
+								x--;
+								break;
+							default:
+								break;
+						}
+						if (--travelCurr<=0) {
+							travel+=0.5f;
+							travelCurr= (int) travel;
+							if (++dir==4) dir=0;
+							//continue;
+						}
+						
+					}
+				} else if (!isCenter) {
+					if ((step1 = !step1)) break;
+				}
 				
-				int dir = 0; 
-
-				int x = 0;
-				int z = 0;
-				float travel = 1;
-				if (y!=m && y!=-m) {
-					travel = m*2-0.5f;
-					x=-m+1;
-					z=m;
-					dir = 1;
-				}
-				int travelCurr = (int) travel;
-				// 0 up
-				// 1 right
-				// 2 down
-				// 3 left
-				while (x!=-m || z!=m+1) {
-
-					checkLocation.setZ(newLocation.getZ()+z);
-					checkLocation.setX(newLocation.getX()+x);
-					
-					if (destinationWorld.getWorldBorder().isInside(checkLocation)) {
-						//TODO check location
-						if (canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, true)) return checkLocation;
-						if (backupLocation==null && canBuildPortal(checkLocation, !zAxis, destinationWorld, height, width, true)) backupLocation = checkLocation.clone();
-						if (backupLocation2==null && canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, false)) backupLocation2 = checkLocation.clone();
-					}
-					
-					switch (dir) {
-						case 0:
-							z++;
-							break;
-						case 1:
-							x++;
-							break;
-						case 2:
-							z--;
-							break;
-						case 3:
-							x--;
-							break;
-						default:
-							break;
-					}
-					if (--travelCurr<=0) {
-						travel+=0.5f;
-						travelCurr= (int) travel;
-						if (++dir==4) dir=0;
-						//continue;
-					}
-					
-				}
 				
 				y+=yAdd;
 				if (yAdd>0) yAdd = -(++yAdd);
