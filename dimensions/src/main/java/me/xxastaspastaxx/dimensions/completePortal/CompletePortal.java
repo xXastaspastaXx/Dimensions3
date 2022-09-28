@@ -446,9 +446,11 @@ public class CompletePortal {
 						if (destinationWorld.getWorldBorder().isInside(checkLocation)) {
 							
 							//TODO check location
-							if (canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, true)) return checkLocation;
-							if (backupLocation==null && canBuildPortal(checkLocation, !zAxis, destinationWorld, height, width, true)) backupLocation = checkLocation.clone();
-							if (backupLocation2==null && canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, false)) backupLocation2 = checkLocation.clone();
+							if (Dimensions.getCompletePortalManager().getCompletePortal(checkLocation, true, true)==null) {
+								if (canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, true)) return checkLocation;
+								if (backupLocation==null && canBuildPortal(checkLocation, !zAxis, destinationWorld, height, width, true)) backupLocation = checkLocation.clone();
+								if (backupLocation2==null && canBuildPortal(checkLocation, zAxis, destinationWorld, height, width, false)) backupLocation2 = checkLocation.clone();
+							}
 						}
 						
 						switch (dir) {
@@ -491,7 +493,7 @@ public class CompletePortal {
 	}
 
 	private boolean canBuildPortal(Location checkLocation, boolean zAxis, World destinationWorld, int height, int width, boolean checkPlatform) {
-		
+				
 		double maxY = (checkLocation.getY()+height);
 		double maxSide = ((zAxis?checkLocation.getZ():checkLocation.getX())+width);
 		

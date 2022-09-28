@@ -78,9 +78,10 @@ public class CompletePortalLoader {
 					
 				}
 				
-				CompletePortal completePortal = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, world, geom, linked), null, CustomPortalIgniteCause.LOAD_PORTAL, null);
-				
+				CompletePortal completePortal = new CompletePortal(customPortal, world, geom, linked);
 				completePortal.setTags(gson.fromJson((String) portal.get("portalTags"), new TypeToken<HashMap<String, Object>>() { }.getType()));
+				
+				Dimensions.getCompletePortalManager().createNew(completePortal, null, CustomPortalIgniteCause.LOAD_PORTAL, null);
 				
 				
 			}

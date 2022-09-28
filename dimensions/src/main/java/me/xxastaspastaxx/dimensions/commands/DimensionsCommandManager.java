@@ -22,8 +22,9 @@ public class DimensionsCommandManager implements CommandExecutor {
      * @param main the instance of the Dimensions lpugin
      */
     public DimensionsCommandManager(Dimensions main) {
-    	
+
     	commands.add(new HelpCommand("help", "", new String[] {"h"}, "List all commands", "none", false));
+    	commands.add(new InfoCommand("info", "", new String[0], "Info about the plugin", "none", false));
     	commands.add(new AdminHelpCommand("adminHelp", "", new String[] {"ah"}, "List all admin commands", "", false));
     	commands.add(new PermissionsCommand("permissions", "", new String[] {"perms"}, "List all commands with their permissions", "", true));
     	commands.add(new ReloadCommand("reload", "", new String[0], "Reload all configurations and addons", "", true));
@@ -46,7 +47,7 @@ public class DimensionsCommandManager implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
-		if (args.length==0) args = new String[] {"h"};
+		if (args.length==0) args = new String[] {"info"};
 		
 		for (DimensionsCommand command : commands) {
 			if (!command.isThisCommand(args[0])) continue;

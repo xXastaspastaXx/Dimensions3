@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class DimensionsSettings {
 	
 	/**Config version for verion control */
-	private static final double configVersion = 1.0;
+	private static final double configVersion = 1.1;
 	
 	/**Search radius for nearby portals */
 	public static int searchRadius = 128;
@@ -25,6 +25,8 @@ public class DimensionsSettings {
 	public static boolean searchSameSize = false;
 	/**Search first for a portal facing the same axis and has the same size as the one used and then search for any portal */
 	public static boolean searchFirstClonePortal = true;
+	/**Ignore portals that are already linked to another portal */
+	public static boolean ignoreLinkedPortals = false;
 
 	/**Radius to search for a safe place to build a portal */
 	public static int safeSpotSearchRadius = 16;

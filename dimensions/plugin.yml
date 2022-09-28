@@ -3,7 +3,7 @@ main: me.xxastaspastaxx.dimensions.Dimensions
 author: astaspasta
 description: Allow players to easily build portals to another world
 api-version: 1.13
-version: 3.0.10
+version: 3.1.0
 depend: [ProtocolLib]
 softdepend: [a,b,c,d,e]
 commands:

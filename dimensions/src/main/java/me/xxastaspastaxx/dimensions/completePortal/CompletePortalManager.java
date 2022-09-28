@@ -3,6 +3,7 @@ package me.xxastaspastaxx.dimensions.completePortal;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -145,15 +146,17 @@ public class CompletePortalManager {
 	 * @param ratio the world ratio
 	 * @param sameAxis true to allow only portals with the same axis
 	 * @param sameSize true to allow only portals with the same size
+	 * @param predicate if it tests true, then the portal will be included in the search
 	 */
-	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, double ratio, boolean sameAxis, boolean sameSize) {
-		
+	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, double ratio, boolean sameAxis, boolean sameSize, Predicate<CompletePortal> predicate) {
 		double closestDistance =  Math.pow(DimensionsSettings.searchRadius*ratio,2);
 		CompletePortal closestPortal = null;
 		for(CompletePortal complete : completePortals) {
 			if (!complete.getCustomPortal().equals(sample.getCustomPortal()) || !complete.getCenter().getWorld().equals(teleportLocation.getWorld())) continue;
+			if (DimensionsSettings.ignoreLinkedPortals && complete.getLinkedPortal()!=null) continue;
 			if (sameAxis && sample.getPortalGeometry().iszAxis()!=complete.getPortalGeometry().iszAxis()) continue;
 			if (sameSize && (sample.getPortalGeometry().getPortalWidth()!=complete.getPortalGeometry().getPortalWidth() || sample.getPortalGeometry().getPortalHeight()!=complete.getPortalGeometry().getPortalHeight())) continue;
+			if (!predicate.test(closestPortal)) continue;
 			Location temp = complete.getCenter();
 			double dist = NumberConversions.square(temp.getX() - teleportLocation.getX()) + NumberConversions.square(temp.getZ() - teleportLocation.getZ());
 			
@@ -164,6 +167,18 @@ public class CompletePortalManager {
 		}
 		
 		return closestPortal;
+	}
+	
+	/**
+	 * Get the nearest portal
+	 * @param teleportLocation the cetner of the search
+	 * @param sample the portal to check for similarities
+	 * @param ratio the world ratio
+	 * @param sameAxis true to allow only portals with the same axis
+	 * @param sameSize true to allow only portals with the same size
+	 */
+	public CompletePortal getNearestPortal(Location teleportLocation, CompletePortal sample, double ratio, boolean sameAxis, boolean sameSize) {
+		return getNearestPortal(teleportLocation, sample, ratio, sameAxis, sameSize, (portal) -> true);
 	}
 	
 	/**

@@ -27,10 +27,15 @@ public class Dimensions extends JavaPlugin {
 	private static CompletePortalManager completePortalManager;
 	private static CustomPortalManager customPortalManager;
 	
+	/**Stores if this is the demo version of the plugin*/
+	public static final boolean IS_DEMO = false;
+	
 	public void onLoad() {
 		
 		instance = this;
 
+		if (IS_DEMO) DimensionsDebbuger.VERY_HIGH.print("§4WARNING: §cThis is the demo version of the plugin.");
+		
 		DimensionsDebbuger.VERY_LOW.print("Loading Dimensions settings...");
 		new DimensionsSettings(this);
 
