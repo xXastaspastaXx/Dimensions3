@@ -4,3 +4,8 @@
  Wiki: https://astaspastagam.gitbook.io/first-steps/
 
  Javadocs: https://astaspasta.alwaysdata.net/javadocs/
+
+
+# Known issues
+
+- Addons load before their dependencies (update in progress)
