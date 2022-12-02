@@ -18,7 +18,7 @@ public class DimensionsForceLink extends DimensionsAddon implements Listener {
 	HashMap<Player, CompletePortal> savedPortal = new HashMap<Player, CompletePortal>();
 	
 	public DimensionsForceLink() {
-		super("DimensionsForceLink", "3.0.1", "Forcefully link two portals no matter what", DimensionsAddonPriority.NORMAL);
+		super("DimensionsForceLink", "3.0.2", "Forcefully link two portals no matter what", DimensionsAddonPriority.NORMAL);
 	}
 	
 	@Override

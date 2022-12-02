@@ -1,10 +1,12 @@
 package me.xxastaspastaxx.dimensions.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 
@@ -13,7 +15,7 @@ import me.xxastaspastaxx.dimensions.Dimensions;
  *
  */
 
-public class DimensionsCommandManager implements CommandExecutor {
+public class DimensionsCommandManager implements CommandExecutor, TabCompleter {
 
     private ArrayList<DimensionsCommand> commands = new ArrayList<DimensionsCommand>();
     
@@ -66,6 +68,33 @@ public class DimensionsCommandManager implements CommandExecutor {
 		commands.get(0).execute(sender, args);
 		
 		return true;
+	}
+	
+    /**
+     * Check if the command is registered and requests a list of possible completions for a command argument.
+     */
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		if (args.length==1) {
+			ArrayList<String> res = new ArrayList<String>();
+			commands.stream().filter(c -> c.getPermission().contentEquals("none") || sender.hasPermission(c.getPermission())).forEach(c -> res.add(c.getCommand()));
+			return res;
+		}
+		
+		for (DimensionsCommand command : commands) {
+			if (!command.isThisCommand(args[0])) continue;
+			if (!command.getPermission().contentEquals("none") && !sender.hasPermission(command.getPermission())) {
+				return new ArrayList<String>();
+			}
+			try {
+				return command.onTabComplete(sender, args);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}	
+		}
+		
+		return new ArrayList<String>();
 	}
 	
 	/**

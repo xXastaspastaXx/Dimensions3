@@ -1,6 +1,7 @@
 package me.xxastaspastaxx.dimensions.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
@@ -32,4 +33,15 @@ public class HelpCommand extends DimensionsCommand {
 		sender.sendMessage(head);
 	}
 	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args) {
+		ArrayList<String> res = new ArrayList<String>();
+
+		if (args.length!=2) return res;
+		
+		for (int i =1 ;i<=((int) Math.ceil(Dimensions.getCommandManager().getCommands().size()/commandsPerPage));i++)
+			res.add(i+"");
+		
+		return res;
+	}
 }

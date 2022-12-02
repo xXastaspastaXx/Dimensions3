@@ -1,5 +1,6 @@
 package me.xxastaspastaxx.dimensions.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.block.Block;
@@ -47,6 +48,17 @@ public class PortalCommand extends DimensionsCommand {
 		} else {
 			sender.sendMessage("§7[§cDimensions§7] Missing argument. Please use /dim "+this.getCommand()+" "+this.getArgs());
 		}
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args) {
+		ArrayList<String> res = new ArrayList<String>();
+
+		if (args.length!=2) return res;
+		
+		Dimensions.getCustomPortalManager().getCustomPortals().forEach(p -> res.add(p.getPortalId()));
+		
+		return res;
 	}
 	
 }

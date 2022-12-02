@@ -1,7 +1,10 @@
 package me.xxastaspastaxx.dimensions.commands;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
@@ -31,6 +34,19 @@ public class ClearCommand extends DimensionsCommand {
 			sender.sendMessage("§7[§cDimensions§7] Missing argument. Please use /dim "+this.getCommand()+" "+this.getArgs());
 		}
 		
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args) {
+		ArrayList<String> res = new ArrayList<String>();
+		
+		if (args.length != 2) return res;
+
+		res.add("all");
+		Bukkit.getWorlds().forEach(w -> res.add(w.getName()));
+		Dimensions.getCustomPortalManager().getCustomPortals().forEach(w -> res.add(w.getPortalId()));
+		
+		return res;
 	}
 	
 }

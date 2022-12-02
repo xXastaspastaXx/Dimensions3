@@ -15,9 +15,9 @@ public class ReloadCommand extends DimensionsCommand {
 
 		try {
 			Dimensions.getInstance().reload();
-			sender.sendMessage("§7[§cDimensions]§a Reload complete");
+			sender.sendMessage("§7[§cDimensions§7]§a Reload complete");
 		} catch (Exception e) {
-			sender.sendMessage("§7[§cDimensions]§c There was a problem while trying to reload Dimensions. Please check console for more information");
+			sender.sendMessage("§7[§cDimensions§7]§c There was a problem while trying to reload Dimensions. Please check console for more information");
 			e.printStackTrace();
 		}
 	}

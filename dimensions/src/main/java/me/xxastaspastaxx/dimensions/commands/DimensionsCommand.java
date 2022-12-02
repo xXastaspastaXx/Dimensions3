@@ -1,5 +1,8 @@
 package me.xxastaspastaxx.dimensions.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 /**
@@ -105,5 +108,14 @@ public abstract class DimensionsCommand {
 	 * @param args the arguments used
 	 */
 	public abstract void execute(CommandSender sender, String[] args);
+	
+	/**
+	 * Requests a list of possible completions for a command argument.
+	 * @param sender the sender of the command
+	 * @param args the arguments used
+	 */
+	public List<String> onTabComplete(CommandSender sender, String[] args) {
+		return new ArrayList<String>();
+	}
 	
 }

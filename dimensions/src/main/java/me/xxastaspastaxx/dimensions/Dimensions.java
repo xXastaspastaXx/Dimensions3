@@ -2,7 +2,6 @@ package me.xxastaspastaxx.dimensions;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -27,18 +26,13 @@ public class Dimensions extends JavaPlugin {
 	private static CompletePortalManager completePortalManager;
 	private static CustomPortalManager customPortalManager;
 	
-	/**Stores if this is the demo version of the plugin*/
-	public static final boolean IS_DEMO = false;
-	
 	public void onLoad() {
 		
 		instance = this;
-
-		if (IS_DEMO) DimensionsDebbuger.VERY_HIGH.print("§4WARNING: §cThis is the demo version of the plugin.");
 		
 		DimensionsDebbuger.VERY_LOW.print("Loading Dimensions settings...");
 		new DimensionsSettings(this);
-
+ 
 		DimensionsDebbuger.VERY_LOW.print("Loading addons...");
 		addonsManager = new DimensionsAddonManager(this);
 		DimensionsDebbuger.VERY_LOW.print("Loaded "+addonsManager.getAddons().size()+" addons.");
@@ -82,16 +76,6 @@ public class Dimensions extends JavaPlugin {
 		
 		int pluginId = 6978;
 		 Metrics metrics = new Metrics(this, pluginId);
-			
-		 metrics.addCustomChart(new Metrics.MultiLineChart("players_and_servers", new Callable<Map<String, Integer>>() {
-	            @Override
-	            public Map<String, Integer> call() throws Exception {
-	                Map<String, Integer> valueMap = new HashMap<>();
-	                valueMap.put("servers", 1);
-	                valueMap.put("players", Bukkit.getOnlinePlayers().size());
-	                return valueMap;
-	            }
-	        }));
 	        
 	        metrics.addCustomChart(new Metrics.DrilldownPie("portal_blocks_frames", () -> {
 	            Map<String, Map<String, Integer>> map = new HashMap<>();

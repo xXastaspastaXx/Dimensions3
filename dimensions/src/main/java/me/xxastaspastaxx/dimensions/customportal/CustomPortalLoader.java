@@ -73,7 +73,6 @@ public class CustomPortalLoader {
 		PortalGeometry.instance = PortalGeometry.nullGeometry();
 		
 		for (File f : PORTALS_DIRECTORY.listFiles()) {
-			if (Dimensions.IS_DEMO && res.size()>=3) break;
 			String portalID = f.getName().replace(".yml", "");
 			if (portalID.contains(" ")) continue;
 			

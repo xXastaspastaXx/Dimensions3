@@ -1,6 +1,7 @@
 package me.xxastaspastaxx.dimensions.addons.forcelink;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.block.Block;
@@ -59,4 +60,15 @@ public class LinkPortalsCommand extends DimensionsCommand {
 	    
 	}
 
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args) {
+		ArrayList<String> res = new ArrayList<String>();
+
+		if (args.length!=2) return res;
+
+		res.add("select");
+		res.add("set");
+		
+		return res;
+	}
 }
