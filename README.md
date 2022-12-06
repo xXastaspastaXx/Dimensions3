@@ -4,8 +4,5 @@
  Wiki: https://astaspastagam.gitbook.io/first-steps/
 
  Javadocs: https://astaspasta.alwaysdata.net/javadocs/
-
-
-# Known issues
-
-- Addons load before their dependencies (update in progress)
+ 
+ The source code for the free addons can be found here: https://github.com/xXastaspastaXx/Dimensions-3-Free-Addons
