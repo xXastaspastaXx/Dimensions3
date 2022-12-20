@@ -12,6 +12,8 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityTeleport;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
+
 /**
  * The PortalEntity that sends players packets of spawning falling sand with textures of blocks
  *
@@ -36,6 +38,7 @@ public class PortalEntitySand extends PortalEntity {
 		super(location);
 		fallingBlockId =  (int) (Math.random() * Integer.MAX_VALUE);
 		
+	
 		spawnPacket = new WrapperPlayServerSpawnEntity();
 		
 		spawnPacket.setEntityID(fallingBlockId);

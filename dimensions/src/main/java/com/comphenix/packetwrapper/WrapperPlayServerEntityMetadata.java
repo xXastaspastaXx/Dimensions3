@@ -18,6 +18,7 @@
  */
 package com.comphenix.packetwrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.World;
@@ -26,6 +27,12 @@ import org.bukkit.entity.Entity;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.FieldAccessException;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
+
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
+
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 
 public class WrapperPlayServerEntityMetadata extends AbstractPacket {
@@ -96,6 +103,27 @@ public class WrapperPlayServerEntityMetadata extends AbstractPacket {
 	 * @param value - new value.
 	 */
 	public void setMetadata(List<WrappedWatchableObject> value) {
-		handle.getWatchableCollectionModifier().write(0, value);
+		try {
+			Class.forName("com.comphenix.protocol.wrappers.WrappedDataValue");
+			final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
+
+			for(final WrappedWatchableObject entry : value) {
+				if(entry == null) continue;
+
+				final WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
+				wrappedDataValueList.add(
+						new WrappedDataValue(
+								watcherObject.getIndex(),
+								watcherObject.getSerializer(),
+								entry.getRawValue()
+								)
+						);
+			}
+
+			handle.getDataValueCollectionModifier().write(0, wrappedDataValueList);
+		} catch (ClassNotFoundException | FieldAccessException e) {
+			DimensionsDebbuger.DEBUG.print("tttt");
+			handle.getWatchableCollectionModifier().write(0, value);
+		}
 	}
 }

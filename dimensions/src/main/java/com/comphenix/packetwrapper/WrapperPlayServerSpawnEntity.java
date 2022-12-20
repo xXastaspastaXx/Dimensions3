@@ -30,59 +30,12 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.injector.PacketConstructor;
 import com.comphenix.protocol.reflect.FieldAccessException;
-import com.comphenix.protocol.reflect.IntEnum;
 
 public class WrapperPlayServerSpawnEntity extends AbstractPacket {
 	public static final PacketType TYPE = PacketType.Play.Server.SPAWN_ENTITY;
 
 	private static PacketConstructor entityConstructor;
 
-	/**
-	 * Represents the different object types.
-	 * 
-	 * @author Kristian
-	 */
-	public static class ObjectTypes extends IntEnum {
-		public static final int BOAT = 1;
-		public static final int ITEM_STACK = 2;
-		public static final int AREA_EFFECT_CLOUD = 3;
-		public static final int MINECART = 10;
-		public static final int ACTIVATED_TNT = 50;
-		public static final int ENDER_CRYSTAL = 51;
-		public static final int TIPPED_ARROW_PROJECTILE = 60;
-		public static final int SNOWBALL_PROJECTILE = 61;
-		public static final int EGG_PROJECTILE = 62;
-		public static final int GHAST_FIREBALL = 63;
-		public static final int BLAZE_FIREBALL = 64;
-		public static final int THROWN_ENDERPEARL = 65;
-		public static final int WITHER_SKULL_PROJECTILE = 66;
-		public static final int SHULKER_BULLET = 67;
-		public static final int FALLING_BLOCK = 70;
-		public static final int ITEM_FRAME = 71;
-		public static final int EYE_OF_ENDER = 72;
-		public static final int THROWN_POTION = 73;
-		public static final int THROWN_EXP_BOTTLE = 75;
-		public static final int FIREWORK_ROCKET = 76;
-		public static final int LEASH_KNOT = 77;
-		public static final int ARMORSTAND = 78;
-		public static final int FISHING_FLOAT = 90;
-		public static final int SPECTRAL_ARROW = 91;
-		public static final int DRAGON_FIREBALL = 93;
-
-		/**
-		 * The singleton instance. Can also be retrieved from the parent class.
-		 */
-		private static ObjectTypes INSTANCE = new ObjectTypes();
-
-		/**
-		 * Retrieve an instance of the object types enum.
-		 * 
-		 * @return Object type enum.
-		 */
-		public static ObjectTypes getInstance() {
-			return INSTANCE;
-		}
-	}
 
 	public WrapperPlayServerSpawnEntity() {
 		super(new PacketContainer(TYPE), TYPE);
