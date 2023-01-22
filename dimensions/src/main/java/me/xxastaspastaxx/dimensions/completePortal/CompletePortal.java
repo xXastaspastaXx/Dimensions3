@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
@@ -218,6 +219,12 @@ public class CompletePortal {
 				Bukkit.getPluginManager().callEvent(useEvent);
 
 				if (useEvent.isCancelled()) return;
+				
+				if (tags.containsKey("disableTP")) {
+					tags.remove("disableTP");
+					DimensionsDebbuger.DEBUG.print("DISABLE");
+					return;
+				}
 				
 				CompletePortal destination = useEvent.getDestinationPortal();
 				
