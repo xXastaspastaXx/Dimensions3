@@ -1,10 +1,16 @@
 package me.xxastaspastaxx.dimensions;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 
 /**
  * The class creates the config file with the defined variables inside the class for easier access to the config
@@ -14,7 +20,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class DimensionsSettings {
 	
 	/**Config version for verion control */
-	private static final double configVersion = 1.1;
+	private static final double configVersion = 1.2;
 	
 	/**Search radius for nearby portals */
 	public static int searchRadius = 128;
@@ -47,6 +53,8 @@ public class DimensionsSettings {
 	public static boolean enableEntitiesTeleport = false;
 	/**Check for entities inside the portal every set ticks */
 	public static long updateEveryTick = 7;
+	/**List of allowed event checks so admins can control cpu usage */
+	public static List<String> listenToEvents = Arrays.asList(CustomPortalDestroyCause.values()).stream().map(s -> s.name()).collect(Collectors.toList());
 	
 	
 	private static FileConfiguration config;

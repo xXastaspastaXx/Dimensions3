@@ -8,6 +8,9 @@ public enum CustomPortalDestroyCause {
 	DISPENSER,
 	PISTON,
 	BLOCK_PHYSICS,
+	BLOCK_BEHAVIOUR,
+	REDSTONE,
+	FLUID,
 	PLUGIN,
 	UNKNOWN
 	
