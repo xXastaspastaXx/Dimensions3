@@ -354,8 +354,11 @@ public class CompletePortal {
 		if (linkedPortal!=null) return linkedPortal;
 		
 		Location newLocation = getDestinationLocation(overrideLocation, overrideWorld);
+		DimensionsDebbuger.DEBUG.print("New Location: "+newLocation);
 		World destinationWorld = newLocation.getWorld();
+		DimensionsDebbuger.DEBUG.print("Destination World: "+destinationWorld);
 		double ratio = getWorldRatio(destinationWorld);
+		DimensionsDebbuger.DEBUG.print("Ratio: "+ratio);
 		//===============
 		
 		CompletePortal destination = null;
@@ -365,21 +368,38 @@ public class CompletePortal {
 		if (destination==null)
 			destination = Dimensions.getCompletePortalManager().getNearestPortal(newLocation, this, ratio, DimensionsSettings.searchSameAxis, DimensionsSettings.searchSameSize);
 		
+
+		DimensionsDebbuger.DEBUG.print("First try for destination (check for already existing portal): "+destination);
+		if (destination!=null) {
+			DimensionsDebbuger.DEBUG.print("Destination not null. DestLocation: "+destination.getCenter());
+		}
+		
 		if (destination==null) {
+			DimensionsDebbuger.DEBUG.print("Destination not found, attempting to create a portal: ");
 			if (!buildNewPortal) return null;
 			boolean zAxis = portalGeometry.iszAxis();
 			byte width = portalGeometry.getPortalWidth();
 			byte height = portalGeometry.getPortalHeight();
 
+			DimensionsDebbuger.DEBUG.print("Exit portal info: zAxis: "+zAxis+", width: "+width+", height: "+height);
+
 			//TODO find best location
 			Location checkLocation = getSafeLocation(newLocation, zAxis, destinationWorld, height, width);
+			DimensionsDebbuger.DEBUG.print("SafeLocation found: "+checkLocation);
 			if (checkLocation!=null) newLocation = checkLocation;
+			DimensionsDebbuger.DEBUG.print("Final location: "+newLocation);
 			
+
+			DimensionsDebbuger.DEBUG.print("Attempting to build portal...");
 			portalGeometry.buildPortal(newLocation, destinationWorld, customPortal);
+			DimensionsDebbuger.DEBUG.print("Portal should be built at: "+newLocation);
 			
 			PortalGeometry geom = PortalGeometry.getPortalGeometry(customPortal).getPortal(customPortal, newLocation.add(zAxis?0:1,1,zAxis?1:0));
+
+			DimensionsDebbuger.DEBUG.print("Identify built structure: "+(geom==null?"NOPE":"Yep"));
 			if (geom==null) return null;
 			destination = Dimensions.getCompletePortalManager().createNew(new CompletePortal(customPortal, newLocation.getWorld(), geom), null, CustomPortalIgniteCause.EXIT_PORTAL, null);
+			DimensionsDebbuger.DEBUG.print("Created portal instance: "+(destination==null?"NOPE":"Yep"));
 			if (destination==null) return null;
 		}
 		
@@ -387,6 +407,8 @@ public class CompletePortal {
 			setLinkedPortal(destination);
 			destination.setLinkedPortal(this);
 		}
+		
+		DimensionsDebbuger.DEBUG.print("Final destination portal "+(destination==null?"Houston, we have a problem":destination.getCenter()));
 		
 		return destination;
 	}

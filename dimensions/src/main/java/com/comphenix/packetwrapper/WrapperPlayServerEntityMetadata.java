@@ -29,6 +29,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.FieldAccessException;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 
 import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
@@ -103,6 +104,7 @@ public class WrapperPlayServerEntityMetadata extends AbstractPacket {
 	 * @param value - new value.
 	 */
 	public void setMetadata(List<WrappedWatchableObject> value) {
+		
 		try {
 			Class.forName("com.comphenix.protocol.wrappers.WrappedDataValue");
 			final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
@@ -121,7 +123,14 @@ public class WrapperPlayServerEntityMetadata extends AbstractPacket {
 			}
 
 			handle.getDataValueCollectionModifier().write(0, wrappedDataValueList);
-		} catch (ClassNotFoundException | FieldAccessException e) {
+			
+//			final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
+//			value.forEach(entry -> {
+//	       		 final WrappedDataWatcher.WrappedDataWatcherObject dataWatcherObject = entry.getWatcherObject();
+//	       		 wrappedDataValueList.add(new WrappedDataValue(dataWatcherObject.getIndex(), dataWatcherObject.getSerializer(), entry.getRawValue()));
+//	       	 });
+//	       	 handle.getDataValueCollectionModifier().write(0, wrappedDataValueList);
+		} catch (FieldAccessException | ClassNotFoundException e) {
 			DimensionsDebbuger.DEBUG.print("tttt");
 			handle.getWatchableCollectionModifier().write(0, value);
 		}

@@ -30,6 +30,7 @@ public class DimensionsCommandManager implements CommandExecutor, TabCompleter {
     	commands.add(new AdminHelpCommand("adminHelp", "", new String[] {"ah"}, "List all admin commands", "", false));
     	commands.add(new PermissionsCommand("permissions", "", new String[] {"perms"}, "List all commands with their permissions", "", true));
     	commands.add(new ReloadCommand("reload", "", new String[0], "Reload all configurations and addons", "", true));
+    	commands.add(new WorldsCommand("worlds", "", new String[0], "List world names to be used in config", "", true));
     	commands.add(new AdminPermissionsCommand("adminPermissions", "", new String[] {"aperms"}, "List all admin commands with their permissions", "", true));
 		//tempCommands.add(new AddonCommand("addons", "", new String[0], "Open the addon manager gui", "", true));
 		//tempCommands.add(new ReloadCommand("reload", "", new String[0], "Reload the plugin", "", true));

@@ -245,7 +245,7 @@ public class CustomPortal {
 	 * @return null if there is no portal or the CompletePortal that was ignited
 	 */
 	public CompletePortal tryIgnite(Player player, ItemStack item, Location loc) {
-		if (item==null || item.getType()!=lighterMaterial) return null;
+		if (item==null || (lighterMaterial!=null && item.getType()!=lighterMaterial)) return null;
 		if (!isAllowedWorld(loc.getWorld())) return null;
 		PortalGeometry temp = PortalGeometry.getPortalGeometry(this).getPortal(this, loc);
 		if (temp==null) return null;

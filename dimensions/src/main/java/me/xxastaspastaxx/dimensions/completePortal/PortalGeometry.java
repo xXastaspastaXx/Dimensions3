@@ -145,10 +145,16 @@ public class PortalGeometry {
 	 * Check if there is a portal structure at the location
 	 */
 	public PortalGeometry getPortal(CustomPortal customPortal, Location loc) {
+		PortalGeometry geom = getPortal(customPortal, loc, false);
+		return geom!=null?geom:getPortal(customPortal,loc,true);
+	}
+	
+	/**
+	 * Check if there is a portal structure at the location
+	 */
+	public PortalGeometry getPortal(CustomPortal customPortal, Location loc, boolean zAxis) {
 		 
 		 loc = loc.getBlock().getLocation();
-			
-		boolean zAxis = false;
 			
 		Vector min = new Vector();
 		Vector max = new Vector();
@@ -165,24 +171,24 @@ public class PortalGeometry {
 		min.setY(minLocation.getY());
 		max.setY(maxLocation.getY());
 		
-		minLocation = loc.clone();
-		maxLocation = loc.clone();
-		for (int i = 0;i<customPortal.getMaximumHeight();i++) {
-			if (!customPortal.isPortalBlock(minLocation.getBlock())) minLocation.add(-1,0,0);
-			if (!customPortal.isPortalBlock(maxLocation.getBlock())) maxLocation.add(1,0,0);
-		}
-		
-		if (!customPortal.isPortalBlock(minLocation.getBlock()) || !customPortal.isPortalBlock(maxLocation.getBlock())) {
-			
+		if (!zAxis) {
+			minLocation = loc.clone();
+			maxLocation = loc.clone();
+			for (int i = 0;i<customPortal.getMaximumHeight();i++) {
+				if (!customPortal.isPortalBlock(minLocation.getBlock())) minLocation.add(-1,0,0);
+				if (!customPortal.isPortalBlock(maxLocation.getBlock())) maxLocation.add(1,0,0);
+			}
+		} else {
 			minLocation = loc.clone();
 			maxLocation = loc.clone();
 			for (int i = 0;i<customPortal.getMaximumHeight();i++) {
 				if (!customPortal.isPortalBlock(minLocation.getBlock())) minLocation.add(0,0,-1);
 				if (!customPortal.isPortalBlock(maxLocation.getBlock())) maxLocation.add(0,0,1);
 			}
-				if (!customPortal.isPortalBlock(minLocation.getBlock()) || !customPortal.isPortalBlock(maxLocation.getBlock())) return null;
-			zAxis = true;
 		}
+
+
+		if (!customPortal.isPortalBlock(minLocation.getBlock()) || !customPortal.isPortalBlock(maxLocation.getBlock())) return null;
 		
 		min.setX(minLocation.getX());
 		min.setZ(minLocation.getZ());
@@ -253,6 +259,8 @@ public class PortalGeometry {
 	 * @param customPortal
 	 */
 	public void buildPortal(Location newLocation, World destinationWorld, CustomPortal customPortal) {
+		
+		newLocation = newLocation.getBlock().getLocation();
 		
 		double maxY = (newLocation.getY()+portalHeight);
 		double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+portalWidth);

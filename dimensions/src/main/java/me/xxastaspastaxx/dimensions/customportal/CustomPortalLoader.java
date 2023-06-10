@@ -93,7 +93,8 @@ public class CustomPortalLoader {
 //			BlockData[] insideBlockData = new BlockData[] {getInsideBlockData(false, tempBlockData),getInsideBlockData(true, tempBlockData)};
 //			int[] combinedId = createCombinedID(insideBlockData, insideMaterial);
 			
-			Material lighterMaterial = Material.matchMaterial(portalConfig.getString("Portal.LighterMaterial", "FLINT_AND_STEEL"));
+			String ligherMaterialString = portalConfig.getString("Portal.LighterMaterial", "FLINT_AND_STEEL");
+			Material lighterMaterial = ligherMaterialString.equalsIgnoreCase("null")?null:Material.matchMaterial(ligherMaterialString);
 			String[] particlesColorString = portalConfig.getString("Portal.ParticlesColor", "0;0;0").split(";");
 			Color particlesColor = Color.fromBGR(Integer.parseInt(particlesColorString[2]), Integer.parseInt(particlesColorString[1]), Integer.parseInt(particlesColorString[0]));
 			
