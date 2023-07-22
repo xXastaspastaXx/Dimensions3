@@ -9,11 +9,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddonManager;
+import me.xxastaspastaxx.dimensions.addons.patreoncosmetics.DimensionsPatreonCosmetics;
+import me.xxastaspastaxx.dimensions.builder.CreatePortalManager;
 import me.xxastaspastaxx.dimensions.commands.DimensionsCommandManager;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortalManager;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalManager;
 import me.xxastaspastaxx.dimensions.listener.PortalListener;
+import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
 
 /**
  * Main class of the plugin
@@ -25,6 +28,9 @@ public class Dimensions extends JavaPlugin {
 	private static DimensionsAddonManager addonsManager;
 	private static CompletePortalManager completePortalManager;
 	private static CustomPortalManager customPortalManager;
+	private static CreatePortalManager createPortalManager;
+	
+	private static DimensionsPatreonCosmetics patreonCosmetics;
 	
 	public void onLoad() {
 		
@@ -44,6 +50,9 @@ public class Dimensions extends JavaPlugin {
 		DimensionsDebbuger.DEBUG.print("Registering commands...");
 		commandManager = new DimensionsCommandManager(this);
 		
+		if (DimensionsSettings.enablePatreonCosmetics)
+			patreonCosmetics = new DimensionsPatreonCosmetics(this);
+		
 		DimensionsDebbuger.VERY_LOW.print("Enabling addons...");
 		addonsManager.enableAddons();
 		
@@ -52,6 +61,8 @@ public class Dimensions extends JavaPlugin {
 		DimensionsDebbuger.MEDIUM.print("Found "+customPortalManager.getCustomPortals().size()+" portals.");
 		completePortalManager = new CompletePortalManager(this);
 		
+		DimensionsDebbuger.VERY_LOW.print("Instatiating GUIs...");
+		createPortalManager = new CreatePortalManager(this);
 
 		DimensionsDebbuger.DEBUG.print("Registering Listener class...");
 		new PortalListener(this);
@@ -109,6 +120,8 @@ public class Dimensions extends JavaPlugin {
 	}
 	
 	public void reload() {
+		if (patreonCosmetics!=null)
+			patreonCosmetics.disable();
 		addonsManager.unloadAll();
 		completePortalManager.save();
 		HandlerList.unregisterAll(this);
@@ -117,11 +130,15 @@ public class Dimensions extends JavaPlugin {
 		DimensionsSettings.setDefaultWorld();
 
 		commandManager = new DimensionsCommandManager(this);
+		
+		if (DimensionsSettings.enablePatreonCosmetics)
+			patreonCosmetics = new DimensionsPatreonCosmetics(this);
 
 		addonsManager.enableAddons();
 
 		customPortalManager = new CustomPortalManager(this);
 		completePortalManager = new CompletePortalManager(this);
+		createPortalManager = new CreatePortalManager(this);
 		
 		new PortalListener(this);
 		
@@ -152,6 +169,10 @@ public class Dimensions extends JavaPlugin {
 	
 	public static DimensionsCommandManager getCommandManager() {
 		return commandManager;
+	}
+
+	public static CreatePortalManager getCreatePortalManager() {
+		return createPortalManager;
 	}
 	
 }

@@ -54,12 +54,12 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
-import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.completePortal.PortalEntitySolid;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
+import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
 
 
 public class PortalListener implements Listener {

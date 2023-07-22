@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
+import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
+
 /**
  * Use static instances of the class to print debug messages to the appropriate debug level set in the config
  */

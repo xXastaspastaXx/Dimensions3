@@ -1,8 +1,10 @@
 package me.xxastaspastaxx.dimensions.commands;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
 
 public class InfoCommand extends DimensionsCommand {
 	
@@ -12,7 +14,12 @@ public class InfoCommand extends DimensionsCommand {
 	
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		sender.sendMessage("§7[§cDimensions§7] Version "+ Dimensions.getInstance().getDescription().getVersion());
+		
+		if (DimensionsSettings.showPortalsToPlayers) {
+			Dimensions.getCreatePortalManager().handle((Player) sender);
+		} else {
+			sender.sendMessage("§7[§cDimensions§7] Version "+ Dimensions.getInstance().getDescription().getVersion());
+		}
 	}
 	
 	

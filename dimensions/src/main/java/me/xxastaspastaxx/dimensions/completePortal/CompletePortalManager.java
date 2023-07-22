@@ -14,12 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
-import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 import me.xxastaspastaxx.dimensions.events.CustomPortalBreakEvent;
 import me.xxastaspastaxx.dimensions.events.CustomPortalIgniteEvent;
+import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
 
 /**
  * Manages all the complete portals

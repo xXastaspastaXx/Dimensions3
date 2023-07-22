@@ -130,7 +130,7 @@ public class WrapperPlayServerEntityMetadata extends AbstractPacket {
 //	       		 wrappedDataValueList.add(new WrappedDataValue(dataWatcherObject.getIndex(), dataWatcherObject.getSerializer(), entry.getRawValue()));
 //	       	 });
 //	       	 handle.getDataValueCollectionModifier().write(0, wrappedDataValueList);
-		} catch (FieldAccessException | ClassNotFoundException e) {
+		} catch (FieldAccessException | ClassNotFoundException | NullPointerException e) {
 			DimensionsDebbuger.DEBUG.print("tttt");
 			handle.getWatchableCollectionModifier().write(0, value);
 		}

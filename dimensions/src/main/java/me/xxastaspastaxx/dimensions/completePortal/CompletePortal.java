@@ -14,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -22,11 +21,12 @@ import org.bukkit.util.Vector;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
-import me.xxastaspastaxx.dimensions.DimensionsSettings;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
 import me.xxastaspastaxx.dimensions.events.CustomPortalUseEvent;
+import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
+import me.xxastaspastaxx.dimensions.settings.WorldConfiguration;
 
 /**
  * Class containing the info of a built portal
@@ -301,8 +301,6 @@ public class CompletePortal {
 		}
 		newLocation.setWorld(destinationWorld);
 		
-		FileConfiguration conf = DimensionsSettings.getConfig();
-		
 		//Fix world ratio
 		newLocation = newLocation.multiply(getWorldRatio(destinationWorld));
 		WorldBorder border = destinationWorld.getWorldBorder();
@@ -325,14 +323,17 @@ public class CompletePortal {
 			}
 			
 		}
+
+		WorldConfiguration currWorldConfig = DimensionsSettings.getWorldConfiguration(world);
+		WorldConfiguration destWorldConfig = DimensionsSettings.getWorldConfiguration(destinationWorld);
 		
 		//FIX the wolrd height ratio
-		int currMinWorldHeight = conf.getInt("Worlds."+world.getName()+".MinHeight", -60);
-		int currMaxWorldHeight = conf.getInt("Worlds."+world.getName()+".MaxHeight", world.getMaxHeight());
+		int currMinWorldHeight = currWorldConfig.getMinHeight();
+		int currMaxWorldHeight = currWorldConfig.getMaxHeight();
 		int currWorldHeight = currMaxWorldHeight-currMinWorldHeight;
 		
-		int minWorldHeight = conf.getInt("Worlds."+destinationWorld.getName()+".MinHeight", -60);
-		int maxWorldHeight = conf.getInt("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
+		int minWorldHeight = destWorldConfig.getMinHeight();
+		int maxWorldHeight = destWorldConfig.getMaxHeight();
 		int worldHeight = maxWorldHeight-minWorldHeight;
 
 		double currPercent = (getCenter().getY()-currMinWorldHeight)/currWorldHeight;
@@ -419,11 +420,8 @@ public class CompletePortal {
 	 * @return the world ratio
 	 */
 	public double getWorldRatio(World destinationWorld) {
-
-		FileConfiguration conf = DimensionsSettings.getConfig();
-		
-		double currWorldSize = conf.getDouble("Worlds."+world.getName()+".Size", world.getWorldBorder().getSize());
-		double worldSize = conf.getDouble("Worlds."+destinationWorld.getName()+".Size", destinationWorld.getWorldBorder().getSize());
+		double currWorldSize = DimensionsSettings.getWorldConfiguration(world).getSize();
+		double worldSize = DimensionsSettings.getWorldConfiguration(destinationWorld).getSize();
 		double ratio = worldSize/currWorldSize;
 		
 		return ratio;
@@ -434,8 +432,8 @@ public class CompletePortal {
 		Location backupLocation2 = null;
 		Location checkLocation;
 	
-		int minWorldHeight = DimensionsSettings.getConfig().getInt("Worlds."+destinationWorld.getName()+".MinHeight", -60);
-		int maxWorldHeight = DimensionsSettings.getConfig().getInt("Worlds."+destinationWorld.getName()+".MaxHeight", destinationWorld.getMaxHeight());
+		WorldConfiguration destWorldConfig = DimensionsSettings.getWorldConfiguration(destinationWorld);
+		int maxWorldHeight = destWorldConfig.getMaxHeight()-height;
 		
 		for (int m =0;m<DimensionsSettings.safeSpotSearchRadius;m++) {
 			checkLocation = newLocation.clone();
@@ -448,7 +446,7 @@ public class CompletePortal {
 			boolean step1 = true;
 			while ((isCenter && y!=m+1) || !isCenter) {
 				checkLocation.setY(newLocation.getY()+y);
-				if (checkLocation.getY()>=minWorldHeight && checkLocation.getY()<=maxWorldHeight-height) {
+				if (checkLocation.getY()>=destWorldConfig.getMinHeight() && checkLocation.getY()<=maxWorldHeight) {
 					step1 = true;
 					
 					int dir = 0; 

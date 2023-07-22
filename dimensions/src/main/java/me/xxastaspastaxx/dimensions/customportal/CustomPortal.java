@@ -1,5 +1,6 @@
 package me.xxastaspastaxx.dimensions.customportal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import me.xxastaspastaxx.dimensions.AxisOrFace;
 import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.DimensionsUtils;
+import me.xxastaspastaxx.dimensions.addons.DimensionsAddonPlayerGUIAction;
 import me.xxastaspastaxx.dimensions.completePortal.CompletePortal;
 import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
@@ -63,6 +65,8 @@ public class CustomPortal {
 	private int spawnDelayMin;
 	private int spawnDelayMax;
 	private HashMap<EntityType, Integer> entitySpawnList;
+	
+	private ArrayList<DimensionsAddonPlayerGUIAction> playerGUIActions = new ArrayList<DimensionsAddonPlayerGUIAction>();
 	
 	/**
 	 * Constructor of CustomPortal
@@ -300,5 +304,20 @@ public class CustomPortal {
 	 */
 	public EntityType getEntityTransformation(EntityType type) {
 		return entityTransformationList.get(type);
+	}
+
+	/**
+	 * @return list of the actions that can be executed by addons
+	 */
+	public ArrayList<DimensionsAddonPlayerGUIAction> getAddonPlayerGUIActions() {
+		return playerGUIActions;
+	}
+	
+	public void add(ArrayList<DimensionsAddonPlayerGUIAction> newPlayerGUIActions) {
+		playerGUIActions.addAll(newPlayerGUIActions);
+	}
+	
+	public void add(DimensionsAddonPlayerGUIAction newPlayerGUIAction) {
+		playerGUIActions.add(newPlayerGUIAction);
 	}
 }

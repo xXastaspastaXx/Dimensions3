@@ -1,7 +1,9 @@
-package me.xxastaspastaxx.dimensions;
+package me.xxastaspastaxx.dimensions.settings;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import me.xxastaspastaxx.dimensions.Dimensions;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 
 /**
@@ -19,7 +22,13 @@ import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 public class DimensionsSettings {
 	
 	/**Config version for verion control */
-	private static final double configVersion = 1.2;
+	private static final double configVersion = 1.3;
+	
+	/**Enable patreon cosmetics for your server*/
+	public static boolean enablePatreonCosmetics = true;
+	
+	/**Enable to show players the available portals*/
+	public static boolean showPortalsToPlayers = true;
 	
 	/**Search radius for nearby portals */
 	public static int searchRadius = 128;
@@ -54,14 +63,25 @@ public class DimensionsSettings {
 	public static long updateEveryTick = 7;
 	/**List of allowed event checks so admins can control cpu usage */
 	public static List<String> listenToEvents = Arrays.asList(CustomPortalDestroyCause.values()).stream().map(s -> s.name()).collect(Collectors.toList());
+	/**List of configuration per world for easier access + override*/
+	private static HashMap<String, WorldConfiguration> worldConfigurations = new HashMap<String, WorldConfiguration>();
 	
 	
 	private static FileConfiguration config;
 	private static Dimensions main;
 
+	private static ArrayList<String> ignoredSettings = new ArrayList<String>(Arrays.asList(new String[] {
+			"fallbackWorld",
+			"config",
+			"main",
+			"worldConfigurations",
+			"configVersion",
+			"ignoredSettings"
+	}));
 
 	public DimensionsSettings(Dimensions main) {
 		DimensionsSettings.main = main;
+		main.reloadConfig();
 		
 		try {
 			config = main.getConfig();
@@ -69,42 +89,57 @@ public class DimensionsSettings {
 			Field[] fields = this.getClass().getDeclaredFields();
 			
 			if (config.getDouble("configVersion", 0.0)!=configVersion) {
-				for (Field field : fields) {
-					if (field.getName().equals("fallbackWorld") || field.getName().startsWith("config") || field.getName().equals("main")) continue;
-					config.addDefault(field.getName(), field.get(this.getClass()));
-				}
-
-				//config.addDefault("fallbackWorld", fallbackWorld.getName());
-				
+				//UpdateFromPrev
 				config.set("configVersion", configVersion);
-				
-				config.options().copyDefaults(true);
-				main.saveConfig();
 			}
 			
-			//fallbackWorld = Bukkit.getWorld(config.getString("fallbackWorld"));
+			for (Field field : fields) {
+				if (ignoredSettings.contains(field.getName())) continue;
+				config.addDefault(field.getName(), field.get(this.getClass()));
+			}
+			
+			config.options().copyDefaults(true);
+			main.saveConfig();
 			
 			for (Field field : fields) {
-				if (field.getName().equals("fallbackWorld") || field.getName().startsWith("config") || field.getName().equals("main")) continue;
+				if (ignoredSettings.contains(field.getName())) continue;
 				
 				field.set(this.getClass(), config.get(field.getName(), field.get(this.getClass())));
 				
 			}
-		
-
-			main.saveConfig();
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
 		
 	}
 	
+	public static WorldConfiguration getWorldConfiguration(World world) {
+		if (!worldConfigurations.containsKey(world.getName())) {
+			return new WorldConfiguration(world.getMinHeight(), world.getMaxHeight(), world.getWorldBorder().getSize());
+		}
+		
+		return worldConfigurations.get(world.getName());
+	}
+	
 	/**Set the World instance of the default world after all worlds have been loaded */
 	public static void setDefaultWorld() {
 		fallbackWorld = Bukkit.getWorlds().get(0);
 		config.addDefault("fallbackWorld", fallbackWorld.getName());
+		config.options().copyDefaults(true);
 		main.saveConfig();
 		fallbackWorld = Bukkit.getWorld(config.getString("fallbackWorld"));
+		
+		worldConfigurations.clear();
+		if (config.getConfigurationSection("Worlds")!=null) {
+			for (String string : config.getConfigurationSection("Worlds").getKeys(false)) {
+				World world = Bukkit.getWorld(string);
+				worldConfigurations.put(string, new WorldConfiguration(
+						config.getInt("Worlds."+string+".MaxHeight", world.getMinHeight()),
+						config.getInt("Worlds."+string+".MaxHeight", world.getMaxHeight()),
+						config.getDouble("Worlds."+string+".Size", world.getWorldBorder().getSize())
+						));
+			}
+		}
 	}
 
 	/**Get the ./plugins/Dimensions/config.yml instance of FileConfiguration */
