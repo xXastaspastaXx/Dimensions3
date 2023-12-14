@@ -16,6 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -57,6 +58,8 @@ public class CompletePortal {
 	private HashMap<Entity, Integer> queue = new HashMap<Entity, Integer>();
 	
 	private HashMap<String, Object> tags = new HashMap<String, Object>();
+	
+	private boolean brokenPortal = false;
 	
 	/**
 	 * Construct the CompletePortal
@@ -179,18 +182,17 @@ public class CompletePortal {
 	 * Check for nearby entities to teleport
 	 */
 	public void updatePortal() {
-		if (!isActive()) return;
-		//TODO fix entites teleporting even after leaving portal
+		if (!isActive() || brokenPortal) return;
 
 		savedEntities.addAll(world.getNearbyEntities(portalGeometry.getBoundingBox(), new Predicate<Entity>() {
 			@Override
 			public boolean test(Entity t) {
-				return !savedEntities.contains(t) && !(t instanceof Player);
+				return !savedEntities.contains(t) && !(t instanceof Player) && !hold.contains(t);
 			}
 		}));
 		
 		ArrayList<Entity> toRemove = new ArrayList<Entity>();
-		savedEntities.stream().filter(en -> !isInsidePortal(en.getLocation(), false, false)).forEach(en -> toRemove.add(en));
+		savedEntities.stream().filter(en -> !isInsidePortal(en.getLocation(), false, false) && (!(en instanceof LivingEntity) || !isInsidePortal(((LivingEntity) en).getEyeLocation(), false, false))).forEach(en -> toRemove.add(en));
 		
 		toRemove.forEach(en -> {removeFromHold(en); savedEntities.remove(en);});
 		
@@ -206,7 +208,7 @@ public class CompletePortal {
 	 * @see CustomPortalUseEvent
 	 */
 	public void handleEntity(Entity en) {
-		if (hold.contains(en)) return;
+		if (hold.contains(en) || brokenPortal) return;
 		
 		int delay = customPortal.getTeleportDelay()*20;
 		if ((en instanceof Player) && (((Player) en).getGameMode()==GameMode.CREATIVE || ((Player) en).getGameMode()==GameMode.SPECTATOR)) delay = 0;
@@ -215,6 +217,7 @@ public class CompletePortal {
 			
 			@Override
 			public void run() {
+				if (brokenPortal) return;
 				CustomPortalUseEvent useEvent = new CustomPortalUseEvent(CompletePortal.this, en, getDestinationPortal(false, null, null));
 				Bukkit.getPluginManager().callEvent(useEvent);
 
@@ -377,7 +380,10 @@ public class CompletePortal {
 		
 		if (destination==null) {
 			DimensionsDebbuger.DEBUG.print("Destination not found, attempting to create a portal: ");
-			if (!buildNewPortal) return null;
+			if (!buildNewPortal) {
+				DimensionsDebbuger.DEBUG.print("buildExitPortal var is false, skipping this time");
+				return null;
+			}
 			boolean zAxis = portalGeometry.iszAxis();
 			byte width = portalGeometry.getPortalWidth();
 			byte height = portalGeometry.getPortalHeight();
@@ -613,6 +619,7 @@ public class CompletePortal {
 		if (p==null) {
 			Bukkit.getScheduler().cancelTask(particlesTask);
 			Bukkit.getScheduler().cancelTask(entitiesTask);
+			brokenPortal = true;
 		}
 		
 		world.playSound(getCenter(), customPortal.getBreakSound(), 1, 8);

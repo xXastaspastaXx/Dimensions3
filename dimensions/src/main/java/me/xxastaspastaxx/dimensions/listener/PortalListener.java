@@ -136,7 +136,7 @@ public class PortalListener implements Listener {
 		
 		CompletePortal complFrom = Dimensions.getCompletePortalManager().getCompletePortal(from, false, false);
 		
-		if (complTo!=null) {
+		if (DimensionsSettings.enableNetherPortalEffect && complTo!=null) {
 			p.sendBlockChange(to, DimensionsUtils.getNetherPortalEffect(complTo.getPortalGeometry().iszAxis()));
 		}
 		if (DimensionsSettings.enableNetherPortalEffect && complFrom!=null) {
@@ -229,12 +229,12 @@ public class PortalListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
 		e.setCancelled(bucketEvent(e.getPlayer(), e.getBlockClicked().getRelative(e.getBlockFace())));
 	}
 	
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onBucketFill(PlayerBucketFillEvent e) {
 		e.setCancelled(bucketEvent(e.getPlayer(), e.getBlockClicked().getRelative(e.getBlockFace())));
 	}
@@ -359,6 +359,13 @@ public class PortalListener implements Listener {
 	
 	public boolean handleBlockChange(Block block, Entity ent, CustomPortalDestroyCause cause) {
 		
+		if (clicked.containsKey(ent)) {
+			if (System.currentTimeMillis()-clicked.get(ent)<500) {
+				return false;
+			} else {
+				clicked.remove(ent);
+			}
+		}
 		if (!DimensionsSettings.listenToEvents.contains(cause.name())) return false;
 		
 		List<CompletePortal> portals = Dimensions.getCompletePortalManager().getCompletePortals(block.getLocation(), true, false);

@@ -134,7 +134,7 @@ public class DimensionsSettings {
 			for (String string : config.getConfigurationSection("Worlds").getKeys(false)) {
 				World world = Bukkit.getWorld(string);
 				worldConfigurations.put(string, new WorldConfiguration(
-						config.getInt("Worlds."+string+".MaxHeight", world.getMinHeight()),
+						config.getInt("Worlds."+string+".MinHeight", world.getMinHeight()),
 						config.getInt("Worlds."+string+".MaxHeight", world.getMaxHeight()),
 						config.getDouble("Worlds."+string+".Size", world.getWorldBorder().getSize())
 						));

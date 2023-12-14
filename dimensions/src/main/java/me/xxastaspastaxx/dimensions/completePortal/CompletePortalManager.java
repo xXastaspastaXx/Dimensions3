@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalDestroyCause;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalIgniteCause;
@@ -216,6 +217,7 @@ public class CompletePortalManager {
 	 */
 	public boolean removePortal(CompletePortal completePortal, CustomPortalDestroyCause cause, Entity destroyer) {
 		
+		DimensionsDebbuger.DEBUG.print("DESTROYED BY "+cause+" "+destroyer);
 		CustomPortalBreakEvent breakEvent = new CustomPortalBreakEvent(completePortal, cause, destroyer);
 		Bukkit.getPluginManager().callEvent(breakEvent);
 		
