@@ -149,8 +149,11 @@ public class CustomPortalLoader {
 			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
 					worldName,buildExitPortal, allowedWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
 			portal.setInsideBlockData(insideMaterial.createBlockData());
-			for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
-				addon.registerPortal(portalConfig, portal);
+			
+			if (Dimensions.getSubscriptionManager().canLoadAddons()) {
+				for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
+					addon.registerPortal(portalConfig, portal);
+				}
 			}
 			res.add(portal);
 		}

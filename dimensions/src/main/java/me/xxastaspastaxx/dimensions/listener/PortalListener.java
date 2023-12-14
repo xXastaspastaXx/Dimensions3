@@ -130,7 +130,6 @@ public class PortalListener implements Listener {
 	
 	private void handlePositionChange(Player p, Location from, Location to) {
 		if (to.getBlockX() == from.getBlockX() && to.getBlockY() == from.getBlockY() && to.getBlockZ() == from.getBlockZ()) return;
-		
 
 		CompletePortal complTo = Dimensions.getCompletePortalManager().getCompletePortal(to, false, false);
 		
@@ -383,10 +382,22 @@ public class PortalListener implements Listener {
 		if (Dimensions.getCompletePortalManager().getCompletePortal(e.getEntity().getLocation(), false ,false)!=null) e.setCancelled(true);
 	}
 	
-	
-	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
+		
+		if (Dimensions.getSubscriptionManager().isOnlyDevMode()) {
+			int playerSize = Bukkit.getServer().getOnlinePlayers().size();
+			if (playerSize < 10) {
+				e.getPlayer().sendMessage("§cDimensions is running in §ndevelopment§c mode and it will go back to §ndemo§c after §l§n"+(10-playerSize)+"§c more players have joined.\n"
+						+ "Use §l/dim validate§c to unclock full version. (7-day trial available).\n"
+						+ "§o(This message will only appear while Dimensions stays in development mode, you can disabled with §n/dim nodev§c§o)");
+			} else {
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					p.sendMessage("§cDimensions stopped running in §ndevelopment§c mode because more than 10 people joined. Use §l/dim validate§c to unlock full version.");
+				}
+				Dimensions.getSubscriptionManager().stopDevelopmentMode();
+			}
+		}
 		
 		CompletePortal compl = Dimensions.getCompletePortalManager().getCompletePortal(e.getPlayer().getLocation(), false, false);
 		if (compl!=null) {

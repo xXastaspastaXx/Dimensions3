@@ -32,9 +32,11 @@ public class DimensionsCommandManager implements CommandExecutor, TabCompleter {
     	commands.add(new ReloadCommand("reload", "", new String[0], "Reload all configurations and addons", "", true));
     	commands.add(new WorldsCommand("worlds", "", new String[0], "List world names to be used in config", "", true));
     	commands.add(new AdminPermissionsCommand("adminPermissions", "", new String[] {"aperms"}, "List all admin commands with their permissions", "", true));
+    	commands.add(new ValidateCommand("validate", "", new String[0], "Validate Dimensions subscription", "", true));
+    	commands.add(new DisableDevCommand("nodev", "", new String[0], "Disabled development mode", "", true));
 		//tempCommands.add(new AddonCommand("addons", "", new String[0], "Open the addon manager gui", "", true));
 		//tempCommands.add(new ReloadCommand("reload", "", new String[0], "Reload the plugin", "", true));
-		//tempCommands.add(new TestCommand("test", "", new String[] {"t"}, "test", "", true));
+//		commands.add(new TestCommand("test", "", new String[] {"t"}, "test", "", true));
 
     	commands.add(new ClearCommand("clear", "<all/world/portal>", new String[] {"clr"}, "Delete all saved portals.", "", true));
     	commands.add(new PortalCommand("portal", "[portal]", new String[0], "Show info of specified portal or look at a portal", "", true));

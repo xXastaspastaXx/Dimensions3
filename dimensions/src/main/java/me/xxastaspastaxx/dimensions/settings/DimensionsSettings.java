@@ -23,11 +23,15 @@ public class DimensionsSettings {
 	
 	/**Config version for verion control */
 	private static final double configVersion = 1.3;
-	
+
 	/**Enable patreon cosmetics for your server*/
 	public static boolean enablePatreonCosmetics = true;
 	
+	/**Permanently disable development mode*/
+	public static boolean disableDevMode = false;
+	
 	/**Enable to show players the available portals*/
+	
 	public static boolean showPortalsToPlayers = true;
 	
 	/**Search radius for nearby portals */

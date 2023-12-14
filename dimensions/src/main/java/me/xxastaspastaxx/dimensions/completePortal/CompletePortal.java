@@ -380,10 +380,7 @@ public class CompletePortal {
 		
 		if (destination==null) {
 			DimensionsDebbuger.DEBUG.print("Destination not found, attempting to create a portal: ");
-			if (!buildNewPortal) {
-				DimensionsDebbuger.DEBUG.print("buildExitPortal var is false, skipping this time");
-				return null;
-			}
+			if (!buildNewPortal) return null;
 			boolean zAxis = portalGeometry.iszAxis();
 			byte width = portalGeometry.getPortalWidth();
 			byte height = portalGeometry.getPortalHeight();

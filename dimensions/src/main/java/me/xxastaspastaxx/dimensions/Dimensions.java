@@ -17,6 +17,7 @@ import me.xxastaspastaxx.dimensions.customportal.CustomPortal;
 import me.xxastaspastaxx.dimensions.customportal.CustomPortalManager;
 import me.xxastaspastaxx.dimensions.listener.PortalListener;
 import me.xxastaspastaxx.dimensions.settings.DimensionsSettings;
+import me.xxastaspastaxx.dimensions.subscriptionmanager.DimensionsSubscriptionManager;
 
 /**
  * Main class of the plugin
@@ -29,19 +30,29 @@ public class Dimensions extends JavaPlugin {
 	private static CompletePortalManager completePortalManager;
 	private static CustomPortalManager customPortalManager;
 	private static CreatePortalManager createPortalManager;
+	private static DimensionsSubscriptionManager subscriptionManager;
 	
 	private static DimensionsPatreonCosmetics patreonCosmetics;
 	
 	public void onLoad() {
 		
 		instance = this;
+
+		DimensionsDebbuger.VERY_LOW.print("Initializing... Subscription manager");
+		subscriptionManager = new DimensionsSubscriptionManager(this);
+		
 		
 		DimensionsDebbuger.VERY_LOW.print("Loading Dimensions settings...");
 		new DimensionsSettings(this);
+		if (DimensionsSettings.disableDevMode) {
+			subscriptionManager.stopDevelopmentMode();
+		}
  
-		DimensionsDebbuger.VERY_LOW.print("Loading addons...");
-		addonsManager = new DimensionsAddonManager(this);
-		DimensionsDebbuger.VERY_LOW.print("Loaded "+addonsManager.getAddons().size()+" addons.");
+		if (subscriptionManager.canLoadAddons()) {
+			DimensionsDebbuger.VERY_LOW.print("Loading addons...");
+			addonsManager = new DimensionsAddonManager(this);
+			DimensionsDebbuger.VERY_LOW.print("Loaded "+addonsManager.getAddons().size()+" addons.");
+		}
 		
 	}
 	
@@ -50,11 +61,12 @@ public class Dimensions extends JavaPlugin {
 		DimensionsDebbuger.DEBUG.print("Registering commands...");
 		commandManager = new DimensionsCommandManager(this);
 		
-		if (DimensionsSettings.enablePatreonCosmetics)
+		if (DimensionsSettings.enablePatreonCosmetics || !subscriptionManager.isFullAccess())
 			patreonCosmetics = new DimensionsPatreonCosmetics(this);
-		
-		DimensionsDebbuger.VERY_LOW.print("Enabling addons...");
-		addonsManager.enableAddons();
+		if (subscriptionManager.canLoadAddons()) {
+			DimensionsDebbuger.VERY_LOW.print("Enabling addons...");
+			addonsManager.enableAddons();
+		}
 		
 		DimensionsDebbuger.VERY_LOW.print("Loading portals...");
 		customPortalManager = new CustomPortalManager(this);
@@ -122,7 +134,9 @@ public class Dimensions extends JavaPlugin {
 	public void reload() {
 		if (patreonCosmetics!=null)
 			patreonCosmetics.disable();
-		addonsManager.unloadAll();
+		if (subscriptionManager.canLoadAddons()) {
+			addonsManager.unloadAll();
+		}
 		completePortalManager.save();
 		HandlerList.unregisterAll(this);
 		
@@ -131,10 +145,12 @@ public class Dimensions extends JavaPlugin {
 
 		commandManager = new DimensionsCommandManager(this);
 		
-		if (DimensionsSettings.enablePatreonCosmetics)
+		if (DimensionsSettings.enablePatreonCosmetics || !subscriptionManager.isFullAccess())
 			patreonCosmetics = new DimensionsPatreonCosmetics(this);
 
-		addonsManager.enableAddons();
+		if (subscriptionManager.canLoadAddons()) {
+			addonsManager.enableAddons();
+		}
 
 		customPortalManager = new CustomPortalManager(this);
 		completePortalManager = new CompletePortalManager(this);
@@ -147,7 +163,9 @@ public class Dimensions extends JavaPlugin {
 	
 	public void onDisable() {
 		
-		addonsManager.onDisable();
+		if (subscriptionManager.canLoadAddons()) {
+			addonsManager.onDisable();
+		}
 		completePortalManager.save();
 	}
 	
@@ -173,6 +191,10 @@ public class Dimensions extends JavaPlugin {
 
 	public static CreatePortalManager getCreatePortalManager() {
 		return createPortalManager;
+	}
+	
+	public static DimensionsSubscriptionManager getSubscriptionManager() {
+		return subscriptionManager;
 	}
 	
 }
