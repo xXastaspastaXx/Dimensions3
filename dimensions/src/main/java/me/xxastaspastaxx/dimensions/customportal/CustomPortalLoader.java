@@ -1,6 +1,7 @@
 package me.xxastaspastaxx.dimensions.customportal;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class CustomPortalLoader {
 	
 	public static final String DIRECTORY_PATH = "./plugins/Dimensions/Portals";
 	public static final File PORTALS_DIRECTORY = new File(DIRECTORY_PATH);
-	public static final String CONFIG_VERSION = "3.0.0";
+	public static final String CONFIG_VERSION = "3.0.1";
 	
 	private static Class<?> blockClass;
 	private static Class<?> craftBlockDataClass;
@@ -80,7 +81,25 @@ public class CustomPortalLoader {
 			
 			String fVersion = portalConfig.getString("configVersion", "pre3");
 			if (!fVersion.equals(CONFIG_VERSION)) {
-				//TODO
+				
+				if (portalConfig.contains("Options.BuildExitPortal")) {
+					portalConfig.set("Options.ExitPortal.Enable", portalConfig.getBoolean("Options.BuildExitPortal"));
+				} else {
+					portalConfig.set("Options.ExitPortal.Enable", true);
+				}
+				
+				portalConfig.set("Options.BuildExitPortal", null);
+				
+				portalConfig.set("Options.ExitPortal.FixedWidth", -1);
+				portalConfig.set("Options.ExitPortal.FixedHeight", -1);
+				
+				portalConfig.set("configVersion", CONFIG_VERSION);
+				
+				try {
+					portalConfig.save(f);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			boolean enabled = portalConfig.getBoolean("Enable", false);
@@ -122,7 +141,10 @@ public class CustomPortalLoader {
 			if (allowedWorlds.size()==0) allowedWorlds.add("all");
 			
 
-			boolean buildExitPortal = portalConfig.getBoolean("Options.BuildExitPortal", true);
+			boolean buildExitPortal = portalConfig.getBoolean("Options.ExitPortal.Enable", true);
+			int fixedExitPortalWidth = portalConfig.getInt("Options.ExitPortal.FixedWidth", -1);
+			int fixedExitPortalHeight = portalConfig.getInt("Options.ExitPortal.FixedHeight", -1);
+			
 			int teleportDelay = portalConfig.getInt("Options.TeleportDelay", 4);
 			boolean enableParticles = portalConfig.getBoolean("Options.EnableParticles", true);
 			
@@ -147,7 +169,7 @@ public class CustomPortalLoader {
 				entitySpawning.put(EntityType.valueOf(spl[0]), Integer.parseInt(spl[1]));
 			}
 			CustomPortal portal = new CustomPortal(portalID, displayName, enabled, outsideMaterial, outsideBlockDir, insideMaterial, lighterMaterial, particlesColor,breakEffect,minimumHeight,maximumHeight, maximumWidth, minimumWidth,
-					worldName,buildExitPortal, allowedWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
+					worldName,buildExitPortal, fixedExitPortalWidth, fixedExitPortalHeight, allowedWorlds, teleportDelay, enableParticles, entityTransformation, spawningDelay[0], spawningDelay[1], entitySpawning);
 			portal.setInsideBlockData(insideMaterial.createBlockData());
 			for (DimensionsAddon addon : Dimensions.getAddonManager().getAddons()) {
 				addon.registerPortal(portalConfig, portal);

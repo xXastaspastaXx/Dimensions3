@@ -53,8 +53,10 @@ public class CustomPortal {
 
 //	private float worldRatio;
 //	private float worldRatioReturn;
-	
+
 	private boolean buildExitPortal;
+	private int fixedExitPortalWidth;
+	private int fixedExitPortalHeight;
 
 	private List<String> allowedWorldsList;
 	
@@ -85,6 +87,8 @@ public class CustomPortal {
 	 * @param minimumWidth
 	 * @param worldName
 	 * @param buildExitPortal
+	 * @param fixedExitPortalWidth
+	 * @param fixedExitPortalHeight
 	 * @param allowedWorldsList
 	 * @param teleportDelay
 	 * @param enableParticles
@@ -95,7 +99,7 @@ public class CustomPortal {
 	 */
 	public CustomPortal(String portalId, String displayName, boolean enabled, Material outsideMaterial, AxisOrFace outsideBlockDir,
 			Material insideMaterial, Material lighterMaterial, Color particlesColor, Sound breakSound, int minimumHeight,
-			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, boolean buildExitPortal,
+			int maximumHeight, int maximumWidth, int minimumWidth, String worldName, boolean buildExitPortal, int fixedExitPortalWidth, int fixedExitPortalHeight,
 			List<String> allowedWorldsList, int teleportDelay, boolean enableParticles, HashMap<EntityType, EntityType> entityTransformationList,
 			int spawnDelayMin, int spawnDelayMax, HashMap<EntityType, Integer> entitySpawnList) {
 		this.portalId = portalId;
@@ -198,6 +202,14 @@ public class CustomPortal {
 	
 	public boolean canBuildExitPortal() {
 		return buildExitPortal;
+	}
+	
+	public int getFixedExitPortalWidth() {
+		return fixedExitPortalWidth;
+	}
+	
+	public int getFixedExitPortalHeight() {
+		return fixedExitPortalHeight;
 	}
 	
 	public List<String> getAllowWorldsList() {
