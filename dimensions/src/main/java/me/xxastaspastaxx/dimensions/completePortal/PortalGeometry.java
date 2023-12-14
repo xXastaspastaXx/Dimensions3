@@ -262,8 +262,8 @@ public class PortalGeometry {
 		
 		newLocation = newLocation.getBlock().getLocation();
 		
-		double maxY = (newLocation.getY()+portalHeight);
-		double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+portalWidth);
+		double maxY = (newLocation.getY()+(customPortal.getFixedExitPortalHeight()==-1?portalHeight:customPortal.getFixedExitPortalHeight()));
+		double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+(customPortal.getFixedExitPortalWidth()==-1?portalWidth:customPortal.getFixedExitPortalWidth()));
 		
 		for (double y=newLocation.getY();y<=maxY;y++) {
 			for (double side=(zAxis?newLocation.getZ():newLocation.getX());side<=maxSide;side++) {

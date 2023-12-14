@@ -70,7 +70,6 @@ public class DimensionsSettings {
 	/**List of configuration per world for easier access + override*/
 	private static HashMap<String, WorldConfiguration> worldConfigurations = new HashMap<String, WorldConfiguration>();
 	
-	
 	private static FileConfiguration config;
 	private static Dimensions main;
 
