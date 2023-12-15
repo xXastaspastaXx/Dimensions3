@@ -119,6 +119,8 @@ public class CustomPortal {
 //		this.worldRatio = worldRatio;
 //		this.worldRatioReturn = 1/worldRatio;
 		this.buildExitPortal = buildExitPortal;
+		this.fixedExitPortalWidth = fixedExitPortalWidth;
+		this.fixedExitPortalHeight = fixedExitPortalHeight;
 		
 		/*if (allowedWorldsList.contains("!")) {
 			for (String str : allowedWorldsList) {

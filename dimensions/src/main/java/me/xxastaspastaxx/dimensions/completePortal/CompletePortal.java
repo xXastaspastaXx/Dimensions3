@@ -311,7 +311,7 @@ public class CompletePortal {
 
 			double borderX = border.getCenter().getX();
 			double borderZ = border.getCenter().getZ();
-			double borderSize = (border.getSize()/2)-(getPortalGeometry().getPortalWidth()*2);
+			double borderSize = (border.getSize()/2)-(getPortalGeometry().getPortalWidth(customPortal)*2);
 			
 			if (newLocation.getX()>borderX) {
 				newLocation.setX(Math.min(newLocation.getX(), borderX+borderSize));
@@ -385,8 +385,8 @@ public class CompletePortal {
 				return null;
 			}
 			boolean zAxis = portalGeometry.iszAxis();
-			byte width = portalGeometry.getPortalWidth();
-			byte height = portalGeometry.getPortalHeight();
+			byte width = portalGeometry.getPortalWidth(customPortal);
+			byte height = portalGeometry.getPortalHeight(customPortal);
 
 			DimensionsDebbuger.DEBUG.print("Exit portal info: zAxis: "+zAxis+", width: "+width+", height: "+height);
 
