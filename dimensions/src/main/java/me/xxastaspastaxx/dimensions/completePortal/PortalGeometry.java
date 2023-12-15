@@ -106,10 +106,26 @@ public class PortalGeometry {
 	}
 	
 	/**
+	 * Get the height of the portal including fixed height for exit portal
+	 * @param customPortal the customPortal to get the fixed height
+	 */
+	public byte getPortalWidth(CustomPortal customPortal) {
+		return (byte) (customPortal.getFixedExitPortalWidth()==-1?portalHeight:customPortal.getFixedExitPortalWidth());
+	}
+	
+	/**
 	 * Get the height of the portal
 	 */
 	public byte getPortalHeight() {
 		return portalHeight;
+	}
+	
+	/**
+	 * Get the height of the portal including fixed height for exit portal
+	 * @param customPortal the customPortal to get the fixed height
+	 */
+	public byte getPortalHeight(CustomPortal customPortal) {
+		return (byte) (customPortal.getFixedExitPortalHeight()==-1?portalHeight:customPortal.getFixedExitPortalHeight());
 	}
 	
 	/**
@@ -262,8 +278,8 @@ public class PortalGeometry {
 		
 		newLocation = newLocation.getBlock().getLocation();
 		
-		double maxY = (newLocation.getY()+(customPortal.getFixedExitPortalHeight()==-1?portalHeight:customPortal.getFixedExitPortalHeight()));
-		double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+(customPortal.getFixedExitPortalWidth()==-1?portalWidth:customPortal.getFixedExitPortalWidth()));
+		double maxY = (newLocation.getY()+getPortalHeight(customPortal));
+		double maxSide = ((zAxis?newLocation.getZ():newLocation.getX())+getPortalWidth(customPortal));
 		
 		for (double y=newLocation.getY();y<=maxY;y++) {
 			for (double side=(zAxis?newLocation.getZ():newLocation.getX());side<=maxSide;side++) {
