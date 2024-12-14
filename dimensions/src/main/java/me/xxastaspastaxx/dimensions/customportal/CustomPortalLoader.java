@@ -24,6 +24,7 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 
 import me.xxastaspastaxx.dimensions.AxisOrFace;
 import me.xxastaspastaxx.dimensions.Dimensions;
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
 import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 
@@ -47,12 +48,17 @@ public class CustomPortalLoader {
 	 */
 	public CustomPortalLoader() {
 		try {
+			
 			blockClass = MinecraftReflection.getBlockClass();
 			craftBlockDataClass = MinecraftReflection.getCraftBukkitClass("block.data.CraftBlockData");
 			try {
 				getCombinedIdMethod = blockClass.getMethod("i",MinecraftReflection.getIBlockDataClass());
 			} catch (NoSuchMethodException e) {
-				getCombinedIdMethod = blockClass.getMethod("getCombinedId",MinecraftReflection.getIBlockDataClass());
+				try {
+					getCombinedIdMethod = blockClass.getMethod("getCombinedId",MinecraftReflection.getIBlockDataClass());
+				} catch (NoSuchMethodException e2) {
+					getCombinedIdMethod = blockClass.getMethod("j",MinecraftReflection.getIBlockDataClass());
+				}
 			}
 			getStateMethod = craftBlockDataClass.getMethod("getState");
 			
@@ -77,7 +83,7 @@ public class CustomPortalLoader {
 			String portalID = f.getName().replace(".yml", "");
 			if (portalID.contains(" ")) continue;
 			
-			YamlConfiguration portalConfig = YamlConfiguration.loadConfiguration(f);	
+			YamlConfiguration portalConfig = YamlConfiguration.loadConfiguration(f);
 			
 			String fVersion = portalConfig.getString("configVersion", "pre3");
 			if (!fVersion.equals(CONFIG_VERSION)) {

@@ -141,7 +141,8 @@ public class DimensionsUtils {
 			newEn2.setCanPickupItems(en2.getCanPickupItems());
 			newEn2.setCollidable(en2.isCollidable());
 			newEn2.setGliding(en2.isGliding());
-			newEn2.setHealth(newEn2.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()/(en2.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()/en2.getHealth()));
+			Attribute maxHealthAttribute = Attribute.valueOf("MAX_HEALTH") == null ? Attribute.valueOf("GENERIC_MAX_HEALTH") : Attribute.valueOf("MAX_HEALTH");
+			newEn2.setHealth(newEn2.getAttribute(maxHealthAttribute).getValue()/(en2.getAttribute(maxHealthAttribute).getValue()/en2.getHealth()));
 
 			for (Attribute at : Attribute.values()) {
 				AttributeInstance enAt = en2.getAttribute(at);

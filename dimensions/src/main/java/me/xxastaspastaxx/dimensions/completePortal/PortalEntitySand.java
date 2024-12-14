@@ -10,9 +10,8 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityTeleport;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
+import com.comphenix.protocol.reflect.FieldAccessException;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-
-import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 
 /**
  * The PortalEntity that sends players packets of spawning falling sand with textures of blocks
@@ -78,9 +77,13 @@ public class PortalEntitySand extends PortalEntity {
 		
 		teleportPacket = new WrapperPlayServerEntityTeleport();
 		teleportPacket.setEntityID(fallingBlockId);
-		teleportPacket.setX(location.getX()+0.5f);
-		teleportPacket.setY(location.getY());
-		teleportPacket.setZ(location.getZ()+0.5f);
+		try {
+			teleportPacket.setX(location.getX()+0.5f);
+			teleportPacket.setY(location.getY());
+			teleportPacket.setZ(location.getZ()+0.5f);
+		} catch (FieldAccessException e) {
+			teleportPacket.setLocation(location.getX()+0.5f, location.getY(), location.getZ()+0.5f);
+		}
 		
 		destroyPacket = new WrapperPlayServerEntityDestroy();
 		if (destroyPacket.getHandle().getIntegerArrays().size()==1)
