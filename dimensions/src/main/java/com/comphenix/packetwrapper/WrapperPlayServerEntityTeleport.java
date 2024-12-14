@@ -18,12 +18,21 @@
  */
 package com.comphenix.packetwrapper;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.utility.MinecraftReflection;
+
+import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 
 public class WrapperPlayServerEntityTeleport extends AbstractPacket {
 	public static final PacketType TYPE =
@@ -142,5 +151,43 @@ public class WrapperPlayServerEntityTeleport extends AbstractPacket {
 
 	public void setOnGround(boolean value) {
 		handle.getBooleans().write(0, value);
+	}
+
+	public void setLocation(double x, double y, double z) {
+			
+		try {
+		    // Step 1: Retrieve the Vec3D class
+		    Class<?> vec3DClass = MinecraftReflection.getVec3DClass();
+
+		    // Step 2: Retrieve the Vec3D constructor
+		    Constructor<?> vec3DConstructor = vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
+		    vec3DConstructor.setAccessible(true); // Make the constructor accessible if private
+
+		    // Step 3: Create a new Vec3D instance with (x, y, z)
+		    Object vec3DInstance = vec3DConstructor.newInstance(x, y, z);
+
+		    // Step 4: Retrieve the PositionMoveRotation class
+		    Class<?> positionMoveRotationClass = MinecraftReflection.getMinecraftClass("world.entity.PositionMoveRotation");
+
+		    // Step 5: Retrieve the PositionMoveRotation constructor
+		    Constructor<?> positionMoveRotationConstructor = positionMoveRotationClass.getDeclaredConstructor(
+		        vec3DClass, vec3DClass, float.class, float.class
+		    );
+		    positionMoveRotationConstructor.setAccessible(true);
+
+		    // Step 6: Create a PositionMoveRotation instance (we'll use default values for the Vec3D for the second one)
+		    Object defaultVec3D = vec3DConstructor.newInstance(0, 0, 0); // Create another Vec3D instance (0, 0, 0)
+		    float value2 = 0f; // Example value for the second float parameter
+		    float value3 = 0f; // Example value for the third float parameter
+		    Object positionMoveRotationInstance = positionMoveRotationConstructor.newInstance(
+		        vec3DInstance, defaultVec3D, value2, value3
+		    );
+
+		    handle.getModifier().write(1, positionMoveRotationInstance);
+		} catch (Exception e) {
+		    e.printStackTrace();
+			Integer.parseInt("error");
+		}
+		
 	}
 }

@@ -21,6 +21,8 @@ public class DimensionsGUIUtils {
 		return createItem(Material.BLACK_STAINED_GLASS_PANE, "§7");
 	}
 	
+	private static Enchantment DECOR_ENCHANT = Enchantment.getByName("DAMAGE_ALL") == null ? Enchantment.getByName("SMITE") : Enchantment.getByName("DAMAGE_ALL");
+	
 	
 	//Create ItemStack
 	public static ItemStack createItem(Material material, String title) {
@@ -51,9 +53,9 @@ public class DimensionsGUIUtils {
 		ItemStack item = inventory.getItem(index);
 		
 		if (toggleEnchant==1) {
-			item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+			item.addUnsafeEnchantment(DECOR_ENCHANT, 1);
 		} else if (toggleEnchant==-1) {
-			item.removeEnchantment(Enchantment.DAMAGE_ALL);
+			item.removeEnchantment(DECOR_ENCHANT);
 		}
 		
 		ItemMeta meta = item.getItemMeta();
@@ -68,9 +70,9 @@ public class DimensionsGUIUtils {
 	public static void updateItem(ItemStack item, String title, String[] lore, int toggleEnchant) {
 		
 		if (toggleEnchant==1) {
-			item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+			item.addUnsafeEnchantment(DECOR_ENCHANT, 1);
 		} else if (toggleEnchant==-1) {
-			item.removeEnchantment(Enchantment.DAMAGE_ALL);
+			item.removeEnchantment(DECOR_ENCHANT);
 		}
 		
 		ItemMeta meta = item.getItemMeta();
@@ -85,9 +87,9 @@ public class DimensionsGUIUtils {
 	public static void updateItem(ItemStack item, String title, ArrayList<String> lore, int toggleEnchant) {
 		
 		if (toggleEnchant==1) {
-			item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+			item.addUnsafeEnchantment(DECOR_ENCHANT, 1);
 		} else if (toggleEnchant==-1) {
-			item.removeEnchantment(Enchantment.DAMAGE_ALL);
+			item.removeEnchantment(DECOR_ENCHANT);
 		}
 		
 		ItemMeta meta = item.getItemMeta();

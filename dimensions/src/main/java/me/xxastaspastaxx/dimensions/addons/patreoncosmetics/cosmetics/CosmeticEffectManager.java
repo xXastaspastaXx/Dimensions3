@@ -20,11 +20,14 @@ public class CosmeticEffectManager {
 		switch (effect) {
 		
 		case FINAL_SPARK:
-			location.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, location, 100);
+			Particle fireworkParticle = Particle.valueOf("FIREWORKS_SPARK") == null ? Particle.valueOf("ELECTRIC_SPARK") : Particle.valueOf("FIREWORKS_SPARK");
+			location.getWorld().spawnParticle(fireworkParticle, location, 100);
 			location.getWorld().playSound(location, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 1);
 			break;
 		
 		case FILLING_THE_VOID:
+			
+			Particle smokeParticle = Particle.valueOf("SMOKE_NORMAL") == null ? Particle.valueOf("SMOKE") : Particle.valueOf("SMOKE_NORMAL");
 			
 			int amount = 200;
 			double radius = 10;
@@ -36,7 +39,7 @@ public class CosmeticEffectManager {
 	            double z = location.getZ() + (radius * Math.sin(angle));
 	            Location loc = new Location(location.getWorld(), x, location.getY()+DimensionsUtils.getRandom(-5, 5), z);
 	            Vector v = genVec(loc,location);
-	            location.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 0, v.getX(),v.getY(),v.getZ());
+	            location.getWorld().spawnParticle(smokeParticle, loc, 0, v.getX(),v.getY(),v.getZ());
 	        }
 			
 			location.getWorld().playSound(location, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0);
@@ -77,7 +80,8 @@ public class CosmeticEffectManager {
 			break;
 			
 		case EXPLOSIONS:
-            location.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, location, 5,0.5,1,0.5);
+			Particle explosionParticle = Particle.valueOf("EXPLOSION_LARGE") == null ? Particle.valueOf("EXPLOSION") : Particle.valueOf("EXPLOSION_LARGE");
+            location.getWorld().spawnParticle(explosionParticle, location, 5,0.5,1,0.5);
 			location.getWorld().playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 0.2f, 1);
 			break;
 		
