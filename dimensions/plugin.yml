@@ -2,8 +2,8 @@ name: Dimensions
 main: me.xxastaspastaxx.dimensions.Dimensions
 author: astaspasta
 description: Allow players to easily build portals to another world
-api-version: 1.21.3
-version: 3.2.8-SUBSCRIPTION
+api-version: 1.21
+version: 3.2.9-SUBSCRIPTION
 depend: [ProtocolLib]
 softdepend: [BetterPortals, Vault, WorldEdit, WorldGuard, BentoBox, IridiumSkyblock, SuperiorSkyblock2, Oraxen, ItemsAdder, CustomItems, ModelEngine, LightAPI]
 commands:

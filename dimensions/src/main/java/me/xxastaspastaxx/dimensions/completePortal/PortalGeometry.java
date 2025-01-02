@@ -110,7 +110,7 @@ public class PortalGeometry {
 	 * @param customPortal the customPortal to get the fixed height
 	 */
 	public byte getPortalWidth(CustomPortal customPortal) {
-		return (byte) (customPortal.getFixedExitPortalWidth()==-1?portalHeight:customPortal.getFixedExitPortalWidth());
+		return (byte) (customPortal.getFixedExitPortalWidth()==-1?portalWidth:customPortal.getFixedExitPortalWidth());
 	}
 	
 	/**
