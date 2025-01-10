@@ -19,10 +19,6 @@
 package com.comphenix.packetwrapper;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -31,8 +27,6 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.utility.MinecraftReflection;
-
-import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 
 public class WrapperPlayServerEntityTeleport extends AbstractPacket {
 	public static final PacketType TYPE =

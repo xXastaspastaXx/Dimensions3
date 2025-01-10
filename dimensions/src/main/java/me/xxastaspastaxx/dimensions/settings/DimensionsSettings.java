@@ -67,6 +67,10 @@ public class DimensionsSettings {
 	public static long updateEveryTick = 7;
 	/**List of allowed event checks so admins can control cpu usage */
 	public static List<String> listenToEvents = Arrays.asList(CustomPortalDestroyCause.values()).stream().map(s -> s.name()).collect(Collectors.toList());
+
+	/**Check for entities inside the portal every set ticks */
+	public static long portalInsideDelay = 1;
+	
 	/**List of configuration per world for easier access + override*/
 	private static HashMap<String, WorldConfiguration> worldConfigurations = new HashMap<String, WorldConfiguration>();
 	

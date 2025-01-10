@@ -29,12 +29,10 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.FieldAccessException;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 
 import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
-
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 
 public class WrapperPlayServerEntityMetadata extends AbstractPacket {
 	public static final PacketType TYPE =

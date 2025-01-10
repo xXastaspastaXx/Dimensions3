@@ -24,7 +24,6 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 
 import me.xxastaspastaxx.dimensions.AxisOrFace;
 import me.xxastaspastaxx.dimensions.Dimensions;
-import me.xxastaspastaxx.dimensions.DimensionsDebbuger;
 import me.xxastaspastaxx.dimensions.addons.DimensionsAddon;
 import me.xxastaspastaxx.dimensions.completePortal.PortalGeometry;
 

@@ -603,7 +603,7 @@ public class CompletePortal {
 					en.summon(p);
 					
 				}
-			}, 1);
+			}, DimensionsSettings.portalInsideDelay);
 		}
 	}
 

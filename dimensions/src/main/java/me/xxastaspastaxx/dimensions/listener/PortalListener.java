@@ -73,7 +73,7 @@ public class PortalListener implements Listener {
 		//this.pl = pl;
 		//PacketType.Play.Server.UNLOAD_CHUNK = new PacketType(Protocol.PLAY, Sender.SERVER, 0x22, "MapChunk", "SPacketChunkData");
 		
-		packetListener1 = new PacketAdapter(pl, ListenerPriority.LOW, PacketType.Play.Server.MAP_CHUNK) {
+		packetListener1 = new PacketAdapter(pl, ListenerPriority.MONITOR, PacketType.Play.Server.MAP_CHUNK) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				if (event.getPacketType() == PacketType.Play.Server.MAP_CHUNK) {
