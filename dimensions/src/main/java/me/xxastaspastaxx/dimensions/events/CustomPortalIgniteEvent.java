@@ -99,6 +99,9 @@ public class CustomPortalIgniteEvent extends Event implements Cancellable {
 
 	@Override
 	public void setCancelled(boolean arg0) {
+		if (arg0 && this.cause == CustomPortalIgniteCause.EXIT_PORTAL) {
+			return;
+		}
 		this.cancelled = arg0;
 	}
 	
