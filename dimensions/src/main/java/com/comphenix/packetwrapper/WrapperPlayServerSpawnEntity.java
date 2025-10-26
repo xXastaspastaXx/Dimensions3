@@ -280,17 +280,21 @@ public class WrapperPlayServerSpawnEntity extends AbstractPacket {
 	public void setTypeFallingBlock(int combinedID) {
 		
 		try {
-			handle.getEntityTypeModifier().write(0, EntityType.FALLING_BLOCK);
-			handle.getIntegers().write(6, combinedID);
+			handle.getIntegers().write(3, 70);
+			handle.getIntegers().write(4, combinedID);
 		} catch (FieldAccessException e) {
 			try {
 				handle.getIntegers().write(6, 70);
 				handle.getIntegers().write(7, combinedID);
 			} catch (FieldAccessException e1) {
-				handle.getIntegers().write(3, 70);
-				handle.getIntegers().write(4, combinedID);
+				try {
+					handle.getEntityTypeModifier().write(0, EntityType.FALLING_BLOCK);
+					handle.getIntegers().write(6, combinedID);
+				} catch (FieldAccessException e2) {
+					handle.getEntityTypeModifier().write(0, EntityType.FALLING_BLOCK);
+					handle.getIntegers().write(1, combinedID);
+				}
 			}
-			
 		}
 		
 		
